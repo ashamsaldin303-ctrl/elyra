@@ -1,0 +1,804 @@
+'use client'
+
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useTranslations } from 'next-intl'
+import { useReducedMotion } from 'framer-motion'
+import {
+  Inbox, Database, KanbanSquare, Mail, Send,
+  FileText, Clock, CalendarClock, BarChart3, RefreshCw,
+  Play, RotateCw, Check,
+  type LucideIcon,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useIsRtl } from '@/lib/use-rtl'
+import { useRouter } from '@/i18n/navigation'
+import { SectionHeading } from '@/components/shared/section-heading'
+import { playSuccess } from '@/lib/sound'
+import { lenisScrollTo } from '@/lib/lenis-holder'
+import { BRAND_COLORS } from '@/lib/brand-colors'
+
+type StepId =
+  | 'receive' | 'validate' | 'crm' | 'email' | 'telegram'
+  | 'invoice' | 'schedule' | 'update'
+  | 'trigger' | 'collect' | 'analyze' | 'report' | 'notify'
+
+interface StepDef {
+  id: StepId
+  icon: LucideIcon
+}
+
+type ScenarioId = 'newOrder' | 'paymentReminder' | 'weeklyReport'
+
+const SCENARIOS: Record<ScenarioId, StepDef[]> = {
+  newOrder: [
+    { id: 'receive', icon: Inbox },
+    { id: 'validate', icon: Database },
+    { id: 'crm', icon: KanbanSquare },
+    { id: 'email', icon: Mail },
+    { id: 'telegram', icon: Send },
+  ],
+  paymentReminder: [
+    { id: 'invoice', icon: FileText },
+    { id: 'schedule', icon: Clock },
+    { id: 'email', icon: Mail },
+    { id: 'telegram', icon: Send },
+    { id: 'update', icon: RefreshCw },
+  ],
+  weeklyReport: [
+    { id: 'trigger', icon: CalendarClock },
+    { id: 'collect', icon: Database },
+    { id: 'analyze', icon: BarChart3 },
+    { id: 'report', icon: FileText },
+    { id: 'notify', icon: Send },
+  ],
+}
+
+/* UI-3 ───────────────────────────────────────────────────────────────
+ * Literal (non-translated) technical metadata for the enriched stage:
+ * per-step node type badges and per-scenario trigger/entry lines.
+ */
+const NODE_TYPE: Record<StepId, string> = {
+  receive: 'WEBHOOK', validate: 'VALIDATE', crm: 'CRM', email: 'EMAIL', telegram: 'TG',
+  invoice: 'FILE', schedule: 'CRON', update: 'DB',
+  trigger: 'CRON', collect: 'QUERY', analyze: 'AI', report: 'DOC', notify: 'PUSH',
+}
+
+const FLOW_ENTRY: Record<ScenarioId, string> = {
+  newOrder: 'POST /webhook/elyra-lead 200',
+  paymentReminder: 'POST /webhook/invoice-reminder 200',
+  weeklyReport: 'CRON 0 9 * * SUN · fired',
+}
+
+/** UI-3: wall-clock timestamp for log lines — HH:MM:SS.mmm, LTR-safe. */
+function logTimestamp(date: Date): string {
+  const p2 = (n: number) => String(n).padStart(2, '0')
+  const p3 = (n: number) => String(n).padStart(3, '0')
+  return `${p2(date.getHours())}:${p2(date.getMinutes())}:${p2(date.getSeconds())}.${p3(date.getMilliseconds())}`
+}
+
+interface LogLine {
+  id: number
+  time: string
+  kind: 'entry' | 'step' | 'done'
+  text: string
+  ms?: number
+}
+
+const NODE_Y = 140 // svg viewBox y center for nodes
+const VIEW_W = 1000
+const VIEW_H = 280
+
+/* AUDIT-C4 LOW (fix 4 sibling — B9's calculator pattern): next-intl
+   formats NUMBER t() params with the message locale — bare 'ar' renders
+   Latin digits on current engines but is engine-dependent (Safari/JSC
+   CLDR could emit Arabic-Indic numerals, diverging from the site's
+   pinned Latin-numeral sites). Pre-formatting to a STRING param (next-
+   intl inserts string params verbatim) with the ar-u-nu-latn pin hardens
+   the stepOf call site; byte-identical rendering on current engines
+   (small integers, no grouping separators). */
+const formatTNumber = (value: number, isRtl: boolean): string =>
+  new Intl.NumberFormat(isRtl ? 'ar-u-nu-latn' : 'en-US').format(value)
+
+interface SimulatorProps {
+  scenario?: ScenarioId
+  showScenarioPicker?: boolean
+}
+
+export function AutomationSimulator({
+  scenario: initialScenario = 'newOrder',
+  showScenarioPicker = false,
+}: SimulatorProps) {
+  const t = useTranslations('simulator')
+  const isRtl = useIsRtl()
+  const reduced = useReducedMotion()
+  // Batch 2 item 9: locale-aware router (@/i18n/navigation) for the
+  // post-run completion CTA → /contact?service=automation.
+  const router = useRouter()
+
+  const [scenario, setScenario] = useState<ScenarioId>(initialScenario)
+  const steps = SCENARIOS[scenario]
+  const stepCount = steps.length
+
+  // node center positions in % (RTL mirrors the order so the flow reads naturally)
+  const positions = useMemo(() => {
+    const ltr = [8, 29, 50, 71, 92]
+    return isRtl ? [...ltr].reverse() : ltr
+  }, [isRtl])
+
+  const [status, setStatus] = useState<'idle' | 'running' | 'completed'>('idle')
+  const [currentStep, setCurrentStep] = useState(-1)
+  const [completed, setCompleted] = useState<number[]>([])
+  const [counter, setCounter] = useState(0) // live ms counter for current step
+  const [logLines, setLogLines] = useState<LogLine[]>([]) // UI-3: execution log
+  // G2-4 F3: the run button's sim-btn-rise entrance is FIRST-MOUNT-only.
+  // The button unmounts while the flow runs and remounts exactly when
+  // status flips to 'completed' — the same commit that returns focus to
+  // it — so a replaying entrance kept the FOCUSED element (and its ring)
+  // invisible for ~150ms and half-fading for ~600ms after every run.
+  // Latched by run() (the only way the button ever unmounts) so later
+  // remounts — replays, scenario switches after a run — render settled.
+  const [btnIntroDone, setBtnIntroDone] = useState(false)
+
+  const timeouts = useRef<number[]>([])
+  const rafRef = useRef<number>(0)
+  const logSeq = useRef(0) // UI-3: stable id sequence for log lines
+  const logScrollRef = useRef<HTMLDivElement | null>(null)
+  // R9: the nodes stage — the run button sits ABOVE it now, and run()
+  // scrolls it into view so the user always watches the nodes work.
+  const stageRef = useRef<HTMLDivElement | null>(null)
+  // L6-R4 (fix 2 — calculator.tsx's success-swap focus-move precedent):
+  // activating the run button UNMOUNTS it (the progress chip replaces
+  // it) — focus used to fall to <body> for the whole 7s run and was
+  // never restored. While the flow runs, focus lives on the polite
+  // status region (its announcements narrate the run); when the status
+  // flips to 'completed' the replay button has remounted in the same
+  // commit, and focus returns to it.
+  const statusRegionRef = useRef<HTMLDivElement | null>(null)
+  const runButtonRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    if (status === 'running') statusRegionRef.current?.focus()
+    else if (status === 'completed') runButtonRef.current?.focus()
+  }, [status])
+
+  const clearAll = useCallback(() => {
+    timeouts.current.forEach((id) => window.clearTimeout(id))
+    timeouts.current = []
+    cancelAnimationFrame(rafRef.current)
+  }, [])
+
+  const schedule = useCallback((fn: () => void, ms: number) => {
+    const id = window.setTimeout(fn, ms)
+    timeouts.current.push(id)
+  }, [])
+
+  useEffect(() => () => clearAll(), [clearAll])
+
+  const reset = useCallback(() => {
+    clearAll()
+    setStatus('idle')
+    setCurrentStep(-1)
+    setCompleted([])
+    setCounter(0)
+    setLogLines([]) // UI-3: log clears on scenario change
+  }, [clearAll])
+
+  // Reset whenever scenario changes — deferred to rAF so the setStates
+  // inside reset() aren't called synchronously within the effect body.
+  useEffect(() => {
+    let cancelled = false
+    const id = requestAnimationFrame(() => {
+      if (!cancelled) reset()
+    })
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(id)
+    }
+  }, [scenario, reset])
+
+  // UI-3: keep the newest log line in view (instant jump — functional
+  // scrolling, not an animation, so it stays under reduced motion).
+  useEffect(() => {
+    const el = logScrollRef.current
+    if (el) el.scrollTop = el.scrollHeight
+  }, [logLines])
+
+  // L6-R2 (fix 6): the `scenarios.<scenario>.steps.<id>.ms` raw-catalog
+  // lookup was repeated 6× with ONE divergent unsound `as number` cast —
+  // one guarded helper now owns the expression (Number() coercion, so a
+  // drifted catalog yields NaN which the sibling Number.isFinite guards
+  // below neutralize, never a crash).
+  // B4 fix 8 (audit A4 L): t()/t.raw() also THROW on a missing templated
+  // key — every dynamic read below is now t.has()-guarded with a neutral
+  // degrade (catalog-guards discipline): titles fall back to the node's
+  // literal tech badge (NODE_TYPE — the chrome already visible on the
+  // stage), descs render nothing, ms reads as 0 (already neutralized by
+  // the Number.isFinite guards downstream).
+  const stepMs = useCallback(
+    (id: StepId): number => {
+      const key = `scenarios.${scenario}.steps.${id}.ms`
+      return t.has(key) ? Number(t.raw(key)) : 0
+    },
+    [scenario, t]
+  )
+  /** Drift-safe templated step field — null when the catalog key is absent. */
+  const stepText = useCallback(
+    (id: StepId, field: 'title' | 'desc'): string | null => {
+      const key = `scenarios.${scenario}.steps.${id}.${field}`
+      return t.has(key) ? t(key) : null
+    },
+    [scenario, t]
+  )
+  /** Drift-safe step title — falls back to the node's literal tech badge. */
+  const stepTitle = useCallback(
+    (id: StepId): string => stepText(id, 'title') ?? NODE_TYPE[id],
+    [stepText]
+  )
+
+  const totalMs = useMemo(() => {
+    return steps.reduce((acc, step) => {
+      const ms = stepMs(step.id)
+      return acc + (Number.isFinite(ms) ? ms : 0)
+    }, 0)
+  }, [steps, stepMs])
+
+  const run = useCallback(() => {
+    clearAll()
+    setBtnIntroDone(true)
+    setCompleted([])
+    setCounter(0)
+    setStatus('running')
+    setCurrentStep(0)
+
+    // R9 (user request — "the button rises and the user sees the nodes
+    // working"): the run button now lives directly ABOVE the stage, and a
+    // run glides the stage itself into comfortable view (only when it
+    // isn't already fully visible), so the nodes lighting up are never
+    // happening offscreen below the fold. NOTE: routed through
+    // lenisScrollTo (SCROLL-FIX) — a native window.scrollTo({behavior:
+    // 'smooth'}) animates OUTSIDE Lenis while Lenis keeps writing its own
+    // scrollTop each tick: two competing animators = the stutter the
+    // owner reported on this page. Lenis's own glide is the single
+    // smooth writer now (immediate under reduced motion, native
+    // fallback when Lenis is absent).
+    requestAnimationFrame(() => {
+      const stage = stageRef.current
+      if (!stage) return
+      const rect = stage.getBoundingClientRect()
+      const fullyVisible = rect.top >= 0 && rect.bottom <= window.innerHeight
+      if (!fullyVisible) {
+        const target =
+          window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2
+        lenisScrollTo(Math.max(0, target), { immediate: reduced ?? false })
+      }
+    })
+
+    // UI-3: fresh log — the "webhook received" entry line comes first.
+    logSeq.current += 1
+    setLogLines([{
+      id: logSeq.current,
+      time: logTimestamp(new Date()),
+      kind: 'entry',
+      text: FLOW_ENTRY[scenario],
+    }])
+
+    const STEP_DISPLAY = reduced ? 250 : 850
+    const TRANSITION = reduced ? 80 : 320
+
+    steps.forEach((step, i) => {
+      const startAt = i * (STEP_DISPLAY + TRANSITION)
+      schedule(() => {
+        setCurrentStep(i)
+        // animate counter 0 → step.ms over STEP_DISPLAY
+        const target = stepMs(step.id)
+        if (reduced) {
+          setCounter(target)
+        } else {
+          const start = performance.now()
+          const tick = (now: number) => {
+            const p = Math.min(1, (now - start) / STEP_DISPLAY)
+            const eased = 1 - Math.pow(1 - p, 3)
+            setCounter(Math.round(eased * target))
+            if (p < 1) rafRef.current = requestAnimationFrame(tick)
+          }
+          rafRef.current = requestAnimationFrame(tick)
+        }
+      }, startAt)
+
+      schedule(() => {
+        setCompleted((c) => (c.includes(i) ? c : [...c, i]))
+        // UI-3: timestamped log line appended at completion time.
+        const ms = stepMs(step.id)
+        logSeq.current += 1
+        setLogLines((prev) => [...prev, {
+          id: logSeq.current,
+          time: logTimestamp(new Date()),
+          kind: 'step',
+          text: stepTitle(step.id),
+          ms: Number.isFinite(ms) ? ms : 0,
+        }])
+      }, startAt + STEP_DISPLAY)
+    })
+
+    schedule(() => {
+      setStatus('completed')
+      setCurrentStep(-1)
+      setCounter(0)
+      playSuccess() // Phase 2 sensory feedback (always-on ambient mix)
+      // UI-3: final summary line for the terminal.
+      logSeq.current += 1
+      setLogLines((prev) => [...prev, {
+        id: logSeq.current,
+        time: logTimestamp(new Date()),
+        kind: 'done',
+        text: t('flowComplete'),
+        ms: totalMs,
+      }])
+    }, steps.length * (STEP_DISPLAY + TRANSITION))
+  }, [clearAll, reduced, steps, scenario, t, schedule, totalMs, stepMs, stepTitle])
+
+  const secondsLabel = (totalMs / 1000).toFixed(2)
+
+  // current step def
+  const activeStep = currentStep >= 0 ? steps[currentStep] : null
+  const activeStepTitle = activeStep ? stepTitle(activeStep.id) : null
+  const activeStepDesc = activeStep ? stepText(activeStep.id, 'desc') : null
+  const activeStepMs = activeStep ? stepMs(activeStep.id) : 0
+
+  // UI-3: stats chip values — live elapsed while running (finished steps +
+  // in-flight counter; during the inter-step transition the active step is
+  // already in `completed`, so the counter is never double-counted),
+  // expected/final total otherwise.
+  const completedMsSum = useMemo(() => completed.reduce((acc, i) => {
+    const step = steps[i]
+    if (!step) return acc
+    const ms = stepMs(step.id)
+    return acc + (Number.isFinite(ms) ? ms : 0)
+  }, 0), [completed, steps, stepMs])
+  const inFlightMs = currentStep >= 0 && !completed.includes(currentStep) ? counter : 0
+  const totalDisplay = status === 'running' ? completedMsSum + inFlightMs : totalMs
+
+  const statusDotCls = status === 'running'
+    ? 'bg-primary'
+    : status === 'completed'
+      ? 'bg-g-green'
+      : 'bg-white/40'
+
+  return (
+    <section className="bg-elyra-deep py-20 text-elyra-on-dark sm:py-28" aria-labelledby="sim-title">
+      <div className="elyra-container max-w-container">
+        <SectionHeading
+          sec="MOD · FLOW BENCH"
+          kicker={t('kicker')}
+          title={t('title')}
+          subtitle={t('subtitle')}
+          variant="on-dark"
+          titleId="sim-title"
+        />
+
+        {showScenarioPicker ? (
+          // FIX(2-c/14): plain toggle-button group — the previous
+          // role="tablist"/"tab" markup had no tabpanels, no aria-controls
+          // and no roving tabindex, which is an incomplete (broken) tabs
+          // pattern. These are scenario switches, not tabs.
+          <div className="mt-8 flex flex-wrap justify-center gap-2">
+            {(['newOrder', 'paymentReminder', 'weeklyReport'] as ScenarioId[]).map((s) => (
+              <button
+                key={s}
+                type="button"
+                data-cursor="magnet"
+                aria-pressed={scenario === s}
+                onClick={() => setScenario(s)}
+                className={cn(
+                  'inline-flex min-h-11 items-center rounded-full px-4 text-sm font-medium transition-colors',
+                  scenario === s
+                    ? 'bg-primary text-primary-foreground'
+                    : 'border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
+                )}
+              >
+                {t(`scenarios.${s}.label`)}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        {/* R9 (user request — "the button rises up and moves the nodes
+            itself"): the run control now sits directly ABOVE the nodes
+            stage, so a click starts the flow right where the eyes already
+            are, and run() glides the stage into view when needed. The
+            button gets a gentle rise-in on FIRST mount only (G2-4 F3:
+            remounts land focus on it — see btnIntroDone above). */}
+        <div className="mt-8 flex flex-col items-center gap-3">
+          {status !== 'running' ? (
+            <button
+              ref={runButtonRef}
+              type="button"
+              data-cursor="magnet"
+              onClick={run}
+              className={cn(
+                'inline-flex h-12 items-center gap-2 rounded-full bg-primary px-8 text-base font-medium text-primary-foreground shadow-[0_10px_30px_-10px_rgba(0,113,227,0.7)] transition-transform hover:scale-105 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-elyra-deep motion-reduce:animate-none',
+                !btnIntroDone && 'sim-btn-rise'
+              )}
+            >
+              {status === 'completed' ? <RotateCw className="size-4" aria-hidden="true" /> : <Play className="size-4" aria-hidden="true" />}
+              {status === 'completed' ? t('replay') : t('run')}
+            </button>
+          ) : (
+            <span className="inline-flex h-12 items-center gap-2 rounded-full border border-white/15 bg-white/5 px-8 text-sm text-white/60">
+              <span className="size-2 animate-pulse rounded-full bg-primary" aria-hidden="true" />
+              {t('running')}
+            </span>
+          )}
+        </div>
+
+        {/* Stage — Phase 5 WS-7: data-cursor="inspect" so the magnetic
+            cursor shows the localized 'Inspect element' chip over the
+            n8n nodes panel (technical context, not just a magnet snap).
+            LOW-11: the min-w-[680px] stage overflows below ~712px, so the
+            wrapper is a labelled, focusable region (keyboard-scrollable
+            via arrows once focused) + a visible md:hidden hint.
+            R9: stageRef anchors run()'s scroll-into-view. */}
+        <div
+          ref={stageRef}
+          className="mt-6 overflow-x-auto scroll-dark no-scrollbar rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+          data-cursor="inspect"
+          tabIndex={0}
+          role="region"
+          aria-label={t('scrollHint')}
+          // B4 fix 7 (audit A3 M2): data-lenis-prevent-horizontal — Lenis
+          // preventDefaults any wheel with deltaY≠0, so a trackpad
+          // horizontal swipe carrying vertical noise over this rail was
+          // eaten (only pure deltaY===0 events passed natively). With this
+          // attribute Lenis skips rail-hovered events whose |deltaX| ≥
+          // |deltaY| and lets the browser route them into the horizontal
+          // overflow; mostly-vertical intents (|deltaY| > |deltaX|) keep
+          // scrolling the page. NOT plain data-lenis-prevent — that would
+          // kill vertical page scroll over the rail (the log terminal
+          // below uses the full prevent deliberately).
+          data-lenis-prevent-horizontal=""
+        >
+          <div
+            className="elyra-dotgrid relative min-w-[680px]"
+            style={{ height: '260px' }}
+          >
+            {/* SVG edges */}
+            <svg
+              viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+              className="absolute inset-0 size-full"
+              aria-hidden="true"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <linearGradient id="elyra-edge" x1="0" y1="0" x2="1" y2="0">
+                  {/* B4 fix 3: stops re-sourced from the registry (byte-identical). */}
+                  <stop offset="0%" stopColor={BRAND_COLORS.gBlue} stopOpacity="0.2" />
+                  <stop offset="50%" stopColor={BRAND_COLORS.gBlue} stopOpacity="1" />
+                  <stop offset="100%" stopColor={BRAND_COLORS.gGreen} stopOpacity="0.2" />
+                </linearGradient>
+              </defs>
+              {steps.slice(0, -1).map((_, i) => {
+                const x1 = ((positions[i] ?? 0) / 100) * VIEW_W
+                const x2 = ((positions[i + 1] ?? 0) / 100) * VIEW_W
+                const edgeActive = currentStep === i + 1
+                const edgeDone = currentStep > i + 1 || (completed.includes(i) && completed.includes(i + 1)) || (status === 'completed' && completed.includes(i))
+                const stroke = edgeActive ? 'url(#elyra-edge)' : edgeDone ? 'rgba(66,133,244,0.45)' : 'rgba(255,255,255,0.10)'
+                return (
+                  <line
+                    key={i}
+                    x1={x1} y1={NODE_Y} x2={x2} y2={NODE_Y}
+                    stroke={stroke}
+                    strokeWidth={2}
+                    strokeDasharray={edgeActive ? '6 6' : undefined}
+                    className={edgeActive && !reduced ? 'elyra-flow' : undefined}
+                  />
+                )
+              })}
+            </svg>
+            {/* Static stage skin + keyframes now live in globals.css
+                (single-owner convention — G2-1 F4 / G2-4 keyframe
+                hygiene; the inline <style> blocks used to re-declare
+                them per render). Reduced-motion guards stay at the
+                source: the classes/elements below are applied only
+                when !reduced, and the global kill-switch is the
+                backstop. */}
+
+            {/* UI-3: packet dots travel the active edge (below the nodes,
+                so they emerge from / disappear into each node). The
+                animated element is the full-track wrapper (fix 7b above);
+                the dot itself keeps its own -translate-y-1/2 centering
+                transform, separate from the animated wrapper's. */}
+            {!reduced
+              ? steps.slice(0, -1).map((_, i) => {
+                  if (currentStep !== i + 1) return null
+                  const from = positions[i]
+                  const to = positions[i + 1]
+                  if (from == null || to == null) return null
+                  return (
+                    <span
+                      key={`packet-${i}`}
+                      aria-hidden="true"
+                      className="elyra-packet absolute inset-y-0 left-0 w-full"
+                      style={{ '--from': `${from}%`, '--to': `${to}%` } as CSSProperties}
+                    >
+                      <span className="absolute left-0 top-1/2 size-2 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_12px_rgba(0,113,227,0.95)]" />
+                    </span>
+                  )
+                })
+              : null}
+
+            {/* HTML nodes — positioned to align with SVG node centers */}
+            {steps.map((step, i) => {
+              const Icon = step.icon
+              const isActive = currentStep === i
+              const isDone = completed.includes(i)
+              const xPercent = positions[i]
+              if (!xPercent) return null
+              return (
+                <div
+                  key={`${scenario}-${step.id}`}
+                  className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center"
+                  style={{ left: `${xPercent}%`, top: '46%' }}
+                >
+                  {/* UI-3: literal tech type badge (decorative — aria-hidden).
+                      L6-R4 (fix 8d): lang="en" dir="ltr" islands the Latin
+                      chrome — the universal :lang(ar) letter-spacing reset
+                      exempts these, so tracking-[0.18em] correctly applies
+                      in BOTH locales (it computed to `normal` in AR). */}
+                  <span
+                    aria-hidden="true"
+                    lang="en"
+                    dir="ltr"
+                    className={cn(
+                      'elyra-mono mb-1.5 text-[8px] uppercase tracking-[0.18em]',
+                      isActive ? 'text-g-blue' : 'text-white/55'
+                    )}
+                  >
+                    {NODE_TYPE[step.id]}
+                  </span>
+                  <div
+                    className={cn(
+                      // F-S7-11 (audit r2): transition-all → enumerated
+                      // (border/bg/shadow are the only properties that
+                      // change across the isActive/isDone/idle states).
+                      'relative flex size-16 items-center justify-center rounded-2xl border backdrop-blur-md transition-[border-color,background-color,box-shadow] duration-300',
+                      isActive && 'border-primary bg-primary/20 shadow-[0_0_28px_rgba(0,113,227,0.55)]',
+                      isDone && 'border-g-green/70 bg-g-green/15',
+                      !isActive && !isDone && 'border-white/15 bg-white/5',
+                      status === 'completed' && !reduced && 'elyra-node-flash'
+                    )}
+                  >
+                    {isActive && !reduced ? (
+                      /* F-S7-01 (audit r2): the infinite box-shadow framer
+                         loop (1s repaint of a 3-layer shadow, EVERY frame)
+                         is replaced by the codebase's own compositor-only
+                         .elyra-pulse ring (::after transform/opacity —
+                         zero paint). The ring inherits this box's
+                         border-radius (see the elyra-pulse note in
+                         globals.css). */
+                      <span
+                        className="elyra-pulse absolute inset-0 rounded-2xl"
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    <Icon
+                      className={cn(
+                        'size-6 transition-colors',
+                        isActive ? 'text-white' : isDone ? 'text-g-green' : 'text-white/60'
+                      )}
+                      aria-hidden="true"
+                    />
+                    {isDone ? (
+                      <span className="absolute -top-1.5 -end-1.5 flex size-5 items-center justify-center rounded-full bg-g-green text-white">
+                        <Check className="size-3" aria-hidden="true" />
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className={cn(
+                    'mt-2 max-w-[110px] text-center text-xs leading-tight',
+                    isActive ? 'text-white' : 'text-white/55'
+                  )}>
+                    {stepTitle(step.id)}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+        {/* LOW-11: visible horizontal-scroll hint — the stage only
+            overflows below ~712px (min-w-[680px] + container padding),
+            so it is hidden from md (768px) up. Key exists in both
+            catalogs (ar/en simulator.scrollHint). */}
+        <p className="mt-2 text-center text-xs text-white/55 md:hidden">
+          {t('scrollHint')}
+        </p>
+
+        {/* UI-3: compact run stats. No aria-live here on purpose — status
+            changes are announced once by the polite region inside the
+            step card (MED-8 dedup semantics stay authoritative). */}
+        <dl className="mt-6 grid grid-cols-3 gap-3 sm:gap-4">
+          <div className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
+            <dt className="text-[11px] text-white/60">{t('stats.steps')}</dt>
+            <dd className="mt-1 text-lg font-semibold tabular-nums text-white">{stepCount}</dd>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
+            <dt className="text-[11px] text-white/60">{t('stats.total')}</dt>
+            <dd className="mt-1 text-lg font-semibold tabular-nums text-white">{totalDisplay}ms</dd>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
+            <dt className="text-[11px] text-white/60">{t('stats.status')}</dt>
+            <dd className="mt-1 flex items-center gap-2 text-base font-semibold text-white">
+              <span
+                aria-hidden="true"
+                className={cn('size-2 shrink-0 rounded-full', statusDotCls, status === 'running' && 'animate-pulse')}
+              />
+              {t(`state.${status}`)}
+            </dd>
+          </div>
+        </dl>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-5">
+          {/* Step card */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-6 lg:col-span-3">
+            {/* MED-8: live region for status changes (idle/running/stepOf).
+                The per-frame ms counter below is deliberately OUTSIDE this
+                region — polite announcements happen on status/step change
+                only, not every animation frame. tabIndex={-1} (L6-R4 fix 2):
+                programmatically focusable landing spot while the run button
+                is unmounted — out of tab order. */}
+            <div
+              ref={statusRegionRef}
+              tabIndex={-1}
+              className="flex flex-wrap items-center justify-between gap-3"
+              aria-live="polite"
+            >
+              {/* FIX(2-c/13): the completion sentence used to render 3×
+                  (status row left + right + h3). The h3 below is now the
+                  single completion announcement; the status row only
+                  carries idle/running + step progress. */}
+              <p className="text-sm text-white/60">
+                {status === 'idle' ? t('idle') : status === 'running' ? t('running') : null}
+              </p>
+              <p className="text-xs text-white/60">
+                {status === 'running' && activeStep
+                  ? t('stepOf', {
+                      current: formatTNumber(currentStep + 1, isRtl),
+                      total: formatTNumber(stepCount, isRtl),
+                    })
+                  : null}
+              </p>
+            </div>
+
+            {activeStep && status === 'running' ? (
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold text-white">{activeStepTitle}</h3>
+                <p className="mt-1 text-sm text-white/70">{activeStepDesc}</p>
+                <div className="mt-3 flex items-center gap-2 text-xs text-white/50">
+                  <span className="tabular-nums text-g-green-strong">{counter}ms</span>
+                  <span>/ {activeStepMs}ms</span>
+                </div>
+              </div>
+            ) : null}
+
+            {status === 'completed' ? (
+              <div className="mt-4">
+                {/* MED-8: the completion announcement point (see comment
+                    above) — polite, fires once when the flow finishes. */}
+                <h3 className="text-lg font-semibold text-white" aria-live="polite">{t('completed', { seconds: secondsLabel })}</h3>
+                <p className="mt-1 text-sm text-white/70">{t('subtitle')}</p>
+              </div>
+            ) : null}
+
+            {/* Log of completed steps */}
+            {completed.length > 0 ? (
+              <ul className="mt-4 space-y-1.5">
+                {completed.map((idx) => {
+                  const step = steps[idx]
+                  if (!step) return null
+                  const ms = stepMs(step.id)
+                  return (
+                    <li key={step.id} className="flex items-center justify-between gap-2 text-xs">
+                      <span className="flex items-center gap-2 text-white/70">
+                        <Check className="size-3 text-g-green" aria-hidden="true" />
+                        {stepTitle(step.id)}
+                      </span>
+                      <span className="tabular-nums text-white/60">{ms}ms</span>
+                    </li>
+                  )
+                })}
+              </ul>
+            ) : null}
+          </div>
+
+          {/* UI-3: execution log terminal. Supplementary panel — role="log"
+              with an explicit aria-live="off" override so it NEVER
+              duplicates the polite announcements from the step card.
+              dir="ltr" keeps timestamps/monospace alignment correct even
+              on the Arabic RTL page. */}
+          <div className="flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/50 lg:col-span-2">
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-white/85">{t('logTitle')}</h3>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'size-2 shrink-0 rounded-full',
+                  status === 'idle' ? 'bg-white/30' : statusDotCls,
+                  status === 'running' && 'animate-pulse'
+                )}
+              />
+            </div>
+            <div
+              ref={logScrollRef}
+              role="log"
+              aria-live="off"
+              dir="ltr"
+              // data-lenis-prevent: wheel over the terminal log scrolls the
+              // log itself, not the page (REF-2 Phase A — Lenis selector).
+              data-lenis-prevent=""
+              className="elyra-mono scroll-dark max-h-48 min-h-0 flex-1 overflow-y-auto px-4 py-3 font-mono text-[11px] leading-relaxed"
+            >
+              {logLines.length === 0 ? (
+                // literal JS-style comment as the terminal's idle hint
+                // (L6-F1: catalog key simulator.awaiting — the ar copy carries
+                // its own "//" prefix so the terminal chrome stays identical)
+                <p className="text-white/50">{t('awaiting')}</p>
+              ) : (
+                logLines.map((line) => (
+                  <div key={line.id} dir="ltr" className={cn('whitespace-pre', !reduced && 'elyra-log-line')}>
+                    <span className="text-white/50">[{line.time}] </span>
+                    {line.kind === 'entry' ? (
+                      <span className="text-signal">→ </span>
+                    ) : (
+                      <span className="text-g-green-strong">✓ </span>
+                    )}
+                    <span
+                      className={cn(
+                        line.kind === 'entry'
+                          ? 'text-g-blue'
+                          : line.kind === 'done'
+                            ? 'text-g-green-strong'
+                            : 'text-white/80'
+                      )}
+                    >
+                      {line.text}
+                    </span>
+                    {typeof line.ms === 'number' ? (
+                      <>
+                        <span className="text-white/40"> — </span>
+                        <span className="tabular-nums text-white/50">{line.ms}ms</span>
+                      </>
+                    ) : null}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* R9 (user request): the "incoming payload" JSON viewer was
+            REMOVED from the live-automation section (simulator.payloadTitle
+            key dropped from both catalogs; PAYLOADS/jsonLines helpers
+            deleted). The execution-log terminal above remains. */}
+
+        {/* Completion — Batch 2 item 9: the finished run converts instead
+            of dead-ending: completion title + CTA to a prefilled contact
+            request (URL contract: /contact?service=automation, locale-
+            correct via @/i18n/navigation's router). The run/replay control
+            itself now lives ABOVE the nodes stage (R9). */}
+        {status === 'completed' ? (
+          <div className="mt-6 flex flex-col items-center gap-3 text-center">
+            <p className="text-sm font-medium text-white/85">{t('completionTitle')}</p>
+            <button
+              type="button"
+              data-cursor="magnet"
+              onClick={() => router.push('/contact?service=automation')}
+              className="inline-flex h-11 items-center gap-2 rounded-full border border-g-green/40 bg-g-green/15 px-6 text-sm font-medium text-white transition-colors hover:bg-g-green/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-elyra-deep"
+            >
+              <Send className="size-4" aria-hidden="true" />
+              {t('completionCta')}
+            </button>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  )
+}

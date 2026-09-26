@@ -1,0 +1,89 @@
+import { ImageResponse } from 'next/og'
+import { BRAND } from '@/lib/brand-colors'
+
+export const size = { width: 180, height: 180 }
+export const contentType = 'image/png' as const
+
+/**
+ * Apple touch icon — the same E-mark + quad-dot motif as icon.tsx,
+ * scaled 32→180 (×5.625, values rounded). Dark rounded square on the
+ * Node runtime (edge-runtime metadata routes 404 under Turbopack dev).
+ * Hexes import from the single owner src/lib/brand-colors.ts (W3-03);
+ * #F1F5F9 stays local — --elyra-on-dark, deliberately NOT paper
+ * #F5F5F7 (zero-change rule).
+ */
+export default function AppleIcon() {
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: BRAND.dark,
+          borderRadius: '28%',
+          position: 'relative',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            fontSize: 124,
+            fontWeight: 800,
+            color: '#F1F5F9',
+            marginLeft: -11,
+          }}
+        >
+          E
+        </div>
+        <div
+          style={{
+            position: 'absolute',
+            right: 28,
+            top: 51,
+            width: 28,
+            height: 28,
+            borderRadius: '50%',
+            background: BRAND.gBlue,
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            right: 56,
+            top: 101,
+            width: 17,
+            height: 17,
+            borderRadius: '50%',
+            background: BRAND.gRed,
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            right: 28,
+            top: 107,
+            width: 17,
+            height: 17,
+            borderRadius: '50%',
+            background: BRAND.gYellow,
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            right: 56,
+            top: 28,
+            width: 17,
+            height: 17,
+            borderRadius: '50%',
+            background: BRAND.gGreen,
+          }}
+        />
+      </div>
+    ),
+    { ...size }
+  )
+}

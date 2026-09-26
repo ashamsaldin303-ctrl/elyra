@@ -1,0 +1,101 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+# Hotfix H-2: the template MUST ship with the repo — real secrets stay ignored.
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+local-*
+.claude
+.z-ai-config
+*.log
+dev.log
+dev.out.log
+test
+prompt
+
+server.log
+# Skills directory
+/skills/
+
+# database (SQLite) — never track lead data (audit P1-3); history contains
+# only synthetic test data, but future rows would be real PII.
+db/*.db
+db/*.db-wal
+db/*.db-shm
+tool-results/
+
+# one-off dev artifacts (debug screenshots, VLM JSONs, throwaway scripts) —
+# never belongs in VCS (~5MB of local history)
+.scratch/
+
+# sandbox tooling (L6-R5 P3, same pattern as .scratch): environment
+# scaffolding (build/dev scripts + dev.pid), prompt documents and test
+# harnesses that exist for this sandbox only — files STAY on disk
+# (untracked via `git rm -r --cached`) but must not ship in VCS.
+.zscripts/
+upload/
+download/
+tests/
+mini-services/
+
+# Stitch design-lab working zone (G1-C blueprint, G2-5 S-2 P3 — must land
+# BEFORE the first artifact): generated screen HTML/PNGs, prompt files,
+# project/screen registry (metadata.json) and the quota ledger
+# (generations.log) are machine-local dev-time files — never in VCS.
+# DESIGN.md is covered too: its source of truth is the Elyra codebase
+# (globals.css tokens + repo conventions), so the .stitch copy is a
+# disposable export, not a curated VCS file.
+.stitch/
+sbom.cyclonedx.json
+
+# F-S1-02 (gold-standard audit): the sandbox-only gateway config must stay
+# on disk for the preview tooling (the platform gateway reads ./Caddyfile)
+# but NEVER ships in VCS — untracked via `git rm --cached Caddyfile`.
+# Production uses deploy/Caddyfile.example; a CI gate
+# (scripts/check-caddy-gate.mjs) fails if the file ever gets re-added.
+Caddyfile
+
+# AUDIT2 / F-S6-02 (audit r2): the 1.3MB process worklog stays ON DISK as
+# the agents' shared memory (agents must keep reading/appending it) but no
+# longer rides in git — the repo was carrying 58MB of history for a
+# 196-file site, mostly historical worklog blobs. Keep appending locally;
+# a trimmed CHANGELOG can be authored later if a handover ever needs it.
+worklog.md

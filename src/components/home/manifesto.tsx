@@ -1,0 +1,181 @@
+'use client'
+
+import { useEffect, useMemo, useRef } from 'react'
+import { useTranslations } from 'next-intl'
+import { SignalWave } from '@/components/shared/signal-wave'
+import { usePrefersReducedMotion } from '@/lib/use-reduced-motion'
+
+/**
+ * Manifesto (R7) — the scroll-linked word-by-word statement.
+ *
+ * A quiet, editorial "breath" section: one large statement whose words
+ * light up sequentially as the visitor scrolls through it — the classic
+ * award-site reading-lamp effect. The signature line is the last thing
+ * to appear.
+ *
+ * Engineering notes:
+ *   · Zero framer-motion — one rAF-coalesced scroll handler, armed by an
+ *     IntersectionObserver (25% margins) so nothing runs while the
+ *     section is away from the viewport.
+ *   · Scripting-safe: words render at full opacity from the SERVER; the
+ *     effect dims them in its first paint after mount (below the fold,
+ *     so no flash is ever visible). No-JS and reduced-motion users
+ *     simply read a fully-lit statement.
+ *   · Arabic-safe: each word is one inline-block shaping run (joining
+ *     never crosses spans); no letter-spacing.
+ */
+
+/** Words each fade in over this many "word units" of scroll progress. */
+const WORD_WINDOW = 1.8
+/** Extra progress head-room so the last word + signature fully land. */
+const PROGRESS_TAIL = 2.5
+
+export function Manifesto() {
+  const t = useTranslations('manifesto')
+  const reduced = usePrefersReducedMotion()
+
+  const sectionRef = useRef<HTMLElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const wordRefs = useRef<(HTMLSpanElement | null)[]>([])
+  const sigRef = useRef<HTMLParagraphElement>(null)
+
+  const words = useMemo(
+    () => t('body').split(/\s+/).filter((w) => w.length > 0),
+    [t]
+  )
+
+  useEffect(() => {
+    if (reduced) {
+      // G4-3 P2 fix (PACK loop): a hydration race can run the dimming pass
+      // with the SSR snapshot (reduced=false) before the matchMedia
+      // re-render lands here — restore stylesheet opacity so reduced-motion
+      // users never see words stuck at the 0.13 dim floor.
+      for (const el of wordRefs.current) if (el) el.style.opacity = ''
+      if (sigRef.current) sigRef.current.style.opacity = ''
+      return
+    }
+    const section = sectionRef.current
+    const title = titleRef.current
+    if (!section || !title || words.length === 0) return
+
+    const wordEls = wordRefs.current
+    const sig = sigRef.current
+    const n = words.length
+    const span = n + PROGRESS_TAIL
+
+    let raf = 0
+    let armed = false
+
+    const paint = () => {
+      raf = 0
+      // Progress is measured on the STATEMENT (h2), not the section —
+      // the section's py-28 padding + kicker would otherwise complete
+      // the effect while the statement still sits low in the viewport.
+      const rect = title.getBoundingClientRect()
+      const vh = window.innerHeight || 1
+      // Progress 0 → 1 as the section's top travels from 85% to 32% of
+      // the viewport height (a comfortable reading scroll distance).
+      const start = vh * 0.85
+      const end = vh * 0.32
+      const p = Math.min(Math.max((start - rect.top) / (start - end), 0), 1)
+
+      for (let i = 0; i < n; i++) {
+        const el = wordEls[i]
+        if (!el) continue
+        const lit = Math.min(Math.max((p * span - i) / WORD_WINDOW, 0), 1)
+        // Direct style writes — the codebase convention for per-frame
+        // work (never setState in a scroll-driven rAF loop).
+        // F-S5-06 (audit r2): dim floor 0.13 (1.29:1 — the independent
+        // VLM pass read unlit words as "nearly invisible body text") →
+        // 0.30 (≈3.2:1): unlit text stays perceivable while the light-up
+        // gradient keeps the same authored effect.
+        el.style.opacity = (0.3 + 0.7 * lit).toFixed(3)
+      }
+      if (sig) {
+        const lit = Math.min(Math.max((p * span - n - 0.4) / 1.6, 0), 1)
+        sig.style.opacity = (0.3 + 0.7 * lit).toFixed(3)
+      }
+    }
+
+    const onScroll = () => {
+      if (raf || !armed) return
+      raf = requestAnimationFrame(paint)
+    }
+
+    // Dim everything for the effect's start state (SSR painted full
+    // opacity — the no-JS / reduced-motion resting state).
+    armed = true
+    paint()
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        armed = entry?.isIntersecting ?? false
+        if (armed) onScroll()
+      },
+      { rootMargin: '25% 0px 25% 0px' }
+    )
+    io.observe(section)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      io.disconnect()
+      window.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [reduced, words.length])
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden bg-background py-28 sm:py-36"
+      aria-labelledby="manifesto-title"
+    >
+      <div className="elyra-container max-w-container">
+        {/* F-S5-13 (audit r2): the section heading is now the SHORT kicker
+            (what heading/rotor navigation should announce); the ~105-char
+            statement below is demoted from h2 to a styled paragraph —
+            heading navigation no longer reads the entire sentence. */}
+        <h2 id="manifesto-title" className="kicker">
+          {t('kicker')}
+        </h2>
+
+        {/* GLOBAL-1 (plan §8-7): the manifesto sits still — the reading
+            lamp IS the motion here; the velocity lean stays the hero's
+            exclusive signature (one voice per effect). */}
+        <p
+          ref={titleRef}
+          /* L6-R4 (fix 8c): ar-lh-loose keeps the authored Arabic leading
+             on this display-sized statement paragraph (it would otherwise
+             inherit the body default — see the globals.css opt-out note). */
+          className="ar-lh-loose mt-8 max-w-4xl text-3xl font-bold leading-[1.45] text-foreground sm:text-4xl lg:text-[3.2rem] lg:leading-[1.32]"
+        >
+          {words.map((word, i) => (
+            <span key={i}>
+              <span
+                ref={(el) => {
+                  wordRefs.current[i] = el
+                }}
+                className="manifesto-word"
+              >
+                {word}
+              </span>{' '}
+            </span>
+          ))}
+        </p>
+
+        <p
+          ref={sigRef}
+          className="manifesto-sig mt-10 text-lg font-semibold text-primary-strong"
+        >
+          {t('signature')}
+        </p>
+
+        {/* GLOBAL-1 (plan §1.5) — the section's closing flourish: the
+            self-drawing SIGNAL WAVE (the arabesque's scroll-scrubbed
+            pathLength mechanic in the instrument identity; fully drawn
+            for no-JS / reduced motion — see the component header). Auto-
+            sizes to width × 1/10 (viewBox 1200×120). */}
+        <SignalWave className="mx-auto mt-12 block w-full max-w-3xl" />
+      </div>
+    </section>
+  )
+}

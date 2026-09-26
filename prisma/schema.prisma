@@ -1,0 +1,99 @@
+// Elyra — Prisma schema (Phase 1)
+// The Lead model backs the project calculator + contact form submissions.
+// Phase 3 wires POST /api/leads with server-side recompute (guide §2.9)
+// and an HMAC-signed n8n webhook.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// PRIVACY NOTE (audit P2-8): `ipAddress` / `userAgent` are collected for
+// abuse tracing only. A retention policy now ships (L1 fix 2-c): run
+// `bun scripts/clean-leads.ts --purge-days=90` on a schedule (cron /
+// systemd timer) — see README "Deployment" → "Data retention" (the
+// recommended 90-day purge).
+//
+// Captured calculator estimates & contact inquiries (audit P1-3).
+// `integrations` is a JSON-serialized array of IntegrationKey values —
+// SQLite has no scalar list type, so we serialize (guide code-style rule).
+model Lead {
+  id              String   @id @default(cuid())
+  // Customer-facing reference ('c' + 9 base-36 chars, e.g. "c5tr8p13xb")
+  // shown in the success UI and sent on the webhook. Generated BEFORE the
+  // create in /api/leads and PERSISTED here (L1-B P2 fix: it used to be
+  // minted only for the 201 response, so a shown reference was untraceable).
+  // Unique — the API regenerates and retries on a P2002 collision
+  // (odds ~1e-14 per draw).
+  reference       String   @unique
+  // F-S2-01 (gold-standard audit): SHA-256 hex of the client's
+  // `Idempotency-Key` header — a network-level retry of the SAME logical
+  // submission hits the unique index and the route returns the ORIGINAL
+  // 201 { reference } verbatim instead of creating a duplicate row.
+  // NULL for key-less clients (curl/tools) — no dedupe, old behavior.
+  // Hashed, never stored raw: the header is attacker-supplied free text
+  // and must not land in the DB unbounded/unvalidated.
+  idempotencyKey  String?  @unique
+  name            String
+  email           String
+  whatsapp        String?
+  message         String?  // Contact-form inquiry text (calculator leads: null)
+  // SENTINEL (L1-B): calculator leads store the chosen enum ('website' |
+  // 'automation' | 'full'), while contact-form leads store the literal
+  // 'contact' (set in toStoredLead, route.ts) — it never collides with the
+  // calculator enum and marks rows with no estimate (zeros, pages 0).
+  service         String
+  pages           Int
+  languages       String
+  threeD          String
+  integrations    String // JSON serialized: IntegrationKey[]
+  automationLevel String
+  minBudget       Int
+  maxBudget       Int
+  weeksMin        Int
+  weeksMax        Int
+  ipAddress       String?
+  userAgent       String?
+  status          String   @default("new") // new | contacted | won | lost
+  // F-S2-04 (gold-standard audit): delivery outcome of the n8n webhook —
+  // 'sent' | 'failed' | 'disabled' (null = older rows / pre-column era).
+  // Written AFTER the fire-and-forget attempt settles, so failed CRM sync
+  // is queryable (`WHERE webhookStatus = 'failed'`) and
+  // scripts/resend-webhook.ts re-sends exactly those rows
+  // deterministically. The 201 response NEVER waits on it.
+  webhookStatus   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+  @@index([webhookStatus])
+}
+
+// F-S4-03 (gold-standard audit): RUM web-vitals persistence. The
+// /api/vitals beacon keeps its in-memory ring (cheap, lossy, per-process)
+// AND fire-and-forget-persists every sample here, so the operator summary
+// (GET /api/vitals?token=…) survives restarts and serves p75 per
+// route/metric over a 7-day window. Zero PII by contract — name/value/
+// rating/route/navigationType only (the route validates the route string
+// against a strict allowlist shape BEFORE it reaches this table).
+// Retention: the route prunes rows older than 90 days every 500th write
+// (fire-and-forget, never on the beacon's response path).
+// NOTE: `cuid()` (not the audit spec's `cuuid()` — that is not a Prisma
+// default; cuid matches the Lead model's id convention).
+model VitalSample {
+  id      String   @id @default(cuid())
+  name    String // LCP | INP | CLS | TTFB | FCP
+  value   Float
+  rating  String // good | needs-improvement | poor
+  route   String // site path only — validated allowlist shape, no query
+  nav     String // navigation type
+  at      DateTime @default(now())
+
+  @@index([name, at])
+  @@index([route, at])
+}

@@ -1,0 +1,48 @@
+import type { Metadata } from 'next'
+import { hasLocale } from 'next-intl'
+import { notFound } from 'next/navigation'
+import { routing } from '@/i18n/routing'
+import { setRequestLocale } from 'next-intl/server'
+import { PageHero } from '@/components/shared/page-hero'
+import { CTA } from '@/components/shared/cta'
+import { WorkGrid } from '@/components/pages/work-grid'
+import { buildPageMetadata } from '@/lib/seo'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  // Narrow string → Locale for buildPageMetadata (validity is already
+  // guaranteed by the proxy for every reachable route).
+  if (!hasLocale(routing.locales, locale)) notFound()
+  return buildPageMetadata({
+    locale,
+    namespace: 'meta.work',
+    path: '/work',
+  })
+}
+
+export default async function WorkPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  if (!hasLocale(routing.locales, locale)) notFound()
+  // Canonical next-intl pattern: pin the request locale so implicit-locale
+  // getTranslations in this page's subtree (PageHero/CTA/WorkGrid and future
+  // metadata) never fall back to headers() and silently break prerendering.
+  setRequestLocale(locale)
+  return (
+    <>
+      <PageHero
+        namespace="pages.work.hero"
+        atmosphere={{ fig: 'FIG. 04 — WORK INDEX', spec: 'GRID 12 × 8 · INDEX v2.5', word: 'WORK' }}
+      />
+      <WorkGrid />
+      <CTA namespace="pages.work.cta" variant="on-dark" />
+    </>
+  )
+}

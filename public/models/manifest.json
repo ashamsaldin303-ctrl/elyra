@@ -1,0 +1,92 @@
+{
+  "generatedAt": "2026-09-09T20:39:38.811371Z",
+  "models": [],
+  "proceduralKits": [
+    {
+      "kit": "experienceStack",
+      "section": "home hero",
+      "nodes": [
+        "layer_site",
+        "site_edge",
+        "gyro_ring_a",
+        "gyro_ring_b",
+        "gyro_core",
+        "flow_edge",
+        "flow_packet"
+      ]
+    },
+    {
+      "kit": "pipelineJourney",
+      "section": "home method",
+      "nodes": [
+        "workpiece",
+        "gate_led_0..3",
+        "beacon_tip"
+      ]
+    },
+    {
+      "kit": "siteCanvas",
+      "section": "websites hero",
+      "nodes": [
+        "blk_nav",
+        "blk_hero",
+        "blk_card_0..2",
+        "blk_cta",
+        "url_load",
+        "ui_cursor"
+      ]
+    },
+    {
+      "kit": "flowGraph",
+      "section": "automation hero",
+      "nodes": [
+        "node_0..4",
+        "packet_0..2"
+      ]
+    },
+    {
+      "kit": "resultsDeck",
+      "section": "work hero",
+      "nodes": [
+        "chart_bar_0..3",
+        "hub_led"
+      ]
+    },
+    {
+      "kit": "explodedDetail",
+      "section": "about hero",
+      "nodes": [
+        "plate_0..4",
+        "detail_led"
+      ]
+    },
+    {
+      "kit": "braidMerge",
+      "section": "about story",
+      "nodes": [
+        "braid",
+        "braid_tip"
+      ]
+    },
+    {
+      "kit": "messageComposer",
+      "section": "contact hero",
+      "nodes": [
+        "line_0..2",
+        "caret",
+        "send_btn",
+        "fly_packet"
+      ]
+    },
+    {
+      "kit": "brokenLink",
+      "section": "404",
+      "nodes": [
+        "link_left",
+        "link_right",
+        "spark_red",
+        "spark_green"
+      ]
+    }
+  ]
+}

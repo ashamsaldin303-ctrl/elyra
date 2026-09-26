@@ -1,0 +1,306 @@
+import type { Metadata, Viewport } from 'next'
+import Script from 'next/script'
+import { Inter, Cairo, JetBrains_Mono } from 'next/font/google'
+import { notFound } from 'next/navigation'
+import { hasLocale, NextIntlClientProvider } from 'next-intl'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { routing, getDir } from '@/i18n/routing'
+import { SITE_URL } from '@/lib/seo'
+import { OG_IMAGE_ALT } from '@/lib/site-config'
+import { Navbar } from '@/components/layout/navbar'
+import { Footer } from '@/components/layout/footer'
+import { MotionConfigProvider } from '@/components/layout/motion-config'
+import { ScrollProgress } from '@/components/layout/scroll-progress'
+import { WebVitalsReporter } from '@/components/layout/web-vitals'
+import { LazyToaster } from '@/components/layout/lazy-toaster'
+import { CustomCursor } from '@/components/sensory/custom-cursor'
+import { GrainOverlay } from '@/components/sensory/grain-overlay'
+import { SmoothScroll } from '@/components/sensory/smooth-scroll'
+import { AmbientSound } from '@/components/sensory/sound-auto'
+import { EdgeRune } from '@/components/rune/edge-rune'
+import '../globals.css'
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const cairo = Cairo({
+  subsets: ['arabic', 'latin'],
+  variable: '--font-cairo',
+  display: 'swap',
+})
+
+// Batch 1 item 3 — REAL mono: the global --font-mono token (globals.css)
+// resolves to this variable, so every `font-mono` / .elyra-mono usage
+// (simulator terminal, blueprint spec labels, calculator reference pill)
+// renders a true monospace face instead of the old Inter alias. latin
+// subset only — those consumers render ASCII/code tokens (no package
+// install needed).
+// L6-R3 P3: preload:false — the mono face is never above the fold (all
+// consumers are below-fold sections), so preloading it on every route
+// would only compete with Cairo/Inter for early bandwidth; the face
+// lazy-loads on first actual use instead.
+// F-S4-04 (audit r2) — ACCEPTED DEVIATION, documented: three families
+// (Inter + Cairo + JetBrains Mono) against a ≤2-family budget. Cairo is
+// non-negotiable (the Arabic identity face), Inter is the Latin body
+// face (a single latin-only subset — Cairo's latin glyphs are not used),
+// and the mono face is display:swap + preload:false and lazy-loads on
+// first below-fold use. The consolidation candidate (drop JetBrains
+// Mono → system mono stack) is consciously declined: the terminal /
+// blueprint chrome loses its character with ui-monospace. Revisit only
+// if the font budget ever becomes a measured bottleneck.
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+  preload: false,
+})
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }))
+}
+
+// Viewport: explicit width/scale (Next would default these anyway) +
+// themeColor matching the dark hero surface (--elyra-dark #0F172A — every
+// page opens on a dark hero, so browser chrome blends with it). The site
+// is now a DARK-first design (GLOBAL-1 flip: ink base #070A10, navy
+// bands #0F172A) → colorScheme 'dark' so form controls, scrollbars and
+// browser chrome follow the surface.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#070A10',
+  colorScheme: 'dark',
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'meta' })
+  // Locale-aware canonical: Arabic (default) at "/", English at "/en"
+  // (Lighthouse SEO: the EN homepage must not canonicalize to the AR one).
+  const canonicalPath = locale === 'ar' ? '/' : '/en'
+
+  // LOW-1 (R5): pin the card images to the per-locale CANONICAL routes.
+  // The [locale]/opengraph-image.tsx convention emits locale-prefixed URLs
+  // (/ar/opengraph-image → 307 hop to the unprefixed canonical on the
+  // default locale — one redirect for every scraper). Mirrors the absolute
+  // SITE_URL pattern of buildPageMetadata in lib/seo.ts.
+  //
+  // VERIFIED MERGE BEHAVIOR (Next 16.1.3, runtime-probed): the file
+  // convention's og:image is re-injected at the page segment (whose own
+  // metadata is null on pages without generateMetadata), REPLACING any
+  // layout-declared openGraph.images — so og:image on those pages stays
+  // the file-convention URL (200-direct on /en, 307 on / for now).
+  // twitter has NO file-convention entry (no twitter-image.tsx exists), so
+  // the explicit twitter.images below DOES win and kills the og→twitter
+  // autofill that previously mirrored the redirecting URL. Lifting the
+  // og:image override requires page-level metadata (see worklog board-D).
+  const ogImage = {
+    url:
+      locale === 'ar'
+        ? `${SITE_URL}/opengraph-image`
+        : `${SITE_URL}/en/opengraph-image`,
+    width: 1200,
+    height: 630,
+    // Shared alt constant (L1-B P3) — identical to buildPageMetadata's
+    // card in lib/seo.ts (single source in site-config.ts).
+    alt: OG_IMAGE_ALT,
+    type: 'image/png',
+  }
+
+  return {
+    // F-S10-02 (audit r2): static PWA webmanifest (public/manifest.webmanifest
+    // + the 192/512 icons derived from icon.tsx's E-mark art) — the icon set
+    // was complete but unlinked; one metadata line makes installable-PWA
+    // discovery work. AR-primary (lang ar, dir rtl) matching the default
+    // locale; the EN mirror is served from the same manifest (bilingual
+    // name/description inside it).
+    manifest: '/manifest.webmanifest',
+    title: {
+      default: t('title'),
+      template: `%s — Elyra`,
+    },
+    description: t('description'),
+    // L1-B P3: reuse the SITE_URL imported above instead of re-deriving
+    // the env fallback — one source of truth (lib/seo.ts) for both.
+    metadataBase: new URL(SITE_URL),
+    alternates: {
+      canonical: canonicalPath,
+      // P2-3: hreflang set incl. x-default (default Arabic locale).
+      languages: {
+        ar: '/',
+        en: '/en',
+        'x-default': '/',
+      },
+    },
+    openGraph: {
+      title: t('title'),
+      description: t('description'),
+      url: canonicalPath,
+      siteName: 'Elyra',
+      locale: locale === 'ar' ? 'ar_AR' : 'en_US',
+      type: 'website',
+      images: [ogImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t('title'),
+      description: t('description'),
+      images: [ogImage],
+    },
+    // LOW-1 (R5): icons pinned to the per-locale canonical routes. The
+    // [locale]/apple-icon.tsx convention emits /ar/apple-icon on the
+    // default locale (307 hop). Declaring `icons` here takes over from
+    // BOTH file conventions (Next drops the icon.tsx + apple-icon.tsx
+    // entries entirely once `icons` is explicit), so the favicon is
+    // listed explicitly too — /icon, /apple-icon and /en/apple-icon all
+    // serve 200-direct (matcher exclusions, Phase-2 decision #12).
+    icons: {
+      icon: { url: '/icon', type: 'image/png', sizes: '32x32' },
+      apple: {
+        url: locale === 'ar' ? '/apple-icon' : '/en/apple-icon',
+        type: 'image/png',
+        sizes: '180x180',
+      },
+    },
+  }
+}
+
+export default async function LocaleLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  if (!hasLocale(routing.locales, locale)) {
+    notFound()
+  }
+  setRequestLocale(locale)
+  const dir = getDir(locale)
+  // Skip-link copy from the catalog (nav.skipToContent) — no hardcoded
+  // strings that can drift from the messages files.
+  const t = await getTranslations('nav')
+  // L3 FIX (R5): sonner's screen-reader labels are English-only defaults
+  // (containerAriaLabel 'Notifications'; per-toast close button 'Close
+  // toast'). Pass the catalog's translated labels so Arabic visitors get
+  // Arabic toast names. NOTE: in sonner 2.0.7 the close-button label is a
+  // TOAST option (forwarded to every toast from the Toaster via
+  // toastOptions), while containerAriaLabel is a Toaster-level prop.
+  const tCommon = await getTranslations({ locale, namespace: 'common' })
+
+  return (
+    <html
+      lang={locale}
+      dir={dir}
+      className={`${inter.variable} ${cairo.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
+        {/* R3 intro gate — runs BEFORE first paint (parser-blocking head
+            script), so the intro decision is made before anything renders:
+            • same-session repeat visit → data-intro-off: the overlay is
+              display:none from the very first frame (zero dark flash);
+            • genuine first visit ON THE HOMEPAGE, motion allowed →
+              data-intro: the hero entrance animations start PAUSED and stay
+              parked behind the curtain; IntroOverlay removes the attribute
+              only once the 0.85s lift has FULLY completed (R9: the build
+              sequence then starts from time 0 on the revealed stage);
+            • reduced motion / storage unavailable → no attribute, the
+              overlay is display:none via the media query anyway.
+            L6-F1 (P0): arming is now HOMEPAGE-ONLY. Inner pages have no
+            IntroOverlay to disarm data-intro — a genuine first session
+            landing directly on /work, /about, /contact, /services/*, /en/*
+            used to get every .hero-enter pinned at opacity 0 forever
+            (nothing ever removed the attribute). Client-side navigations
+            TO the homepage in such a session are armed by IntroOverlay
+            itself (see intro-overlay.tsx), so the pre-paint homepage check
+            here stays simple.
+            R8.1 attention gate — if the document is HIDDEN at load
+            (background tab / collapsed preview panel), data-page-wait parks
+            every one-shot entrance animation (intro + hero + build) until
+            the first visibilitychange → visible, so the choreography never
+            plays out unseen. Everything is wrapped defensively — this must
+            NEVER throw. */}
+        <Script id="elyra-intro-gate" strategy="beforeInteractive">
+          {`try{var hp=location.pathname==='/'||location.pathname==='/en';if(sessionStorage.getItem('elyra-intro')==='1'){document.documentElement.setAttribute('data-intro-off','1')}else if(hp&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.setAttribute('data-intro','1')}if(document.hidden){document.documentElement.setAttribute('data-page-wait','1');var w=function(){if(!document.hidden){document.documentElement.removeAttribute('data-page-wait');document.removeEventListener('visibilitychange',w)}};document.addEventListener('visibilitychange',w)}}catch(e){}`}
+        </Script>
+        <NextIntlClientProvider>
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:start-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+          >
+            {t('skipToContent')}
+          </a>
+          <Navbar />
+          {/* F-S3-06 / F-S4-02 (gold-standard audit): web-vitals RUM beacon —
+              renders nothing, posts final LCP/INP/CLS/TTFB/FCP per page load
+              to /api/vitals (zero PII). See components/layout/web-vitals.tsx. */}
+          <WebVitalsReporter />
+          {/* REF-2 Phase A — Lenis smooth scroll (renders nothing; reduced
+              motion → native scroll untouched). Mounted before the navbar
+              so its instance exists for anchor routing on first paint. */}
+          <SmoothScroll />
+          <ScrollProgress />
+          <main id="main" className="flex-1">
+            {/* W2-03 (D15): framer-motion reducedMotion="user" umbrella —
+                every framer animation in the page tree becomes instant for
+                reduced-motion visitors. Manual rAF gating elsewhere is
+                untouched (see components/layout/motion-config.tsx). */}
+            <MotionConfigProvider>{children}</MotionConfigProvider>
+          </main>
+          {/* W4-05: locale flows in as a prop so the footer's status line
+              can feed the DamascusClock island without an async component
+              (see footer.tsx comment). */}
+          <Footer locale={locale} />
+          {/* Rune Field (RUNE-2) — full-viewport ambient volumetric layer
+              (WebGL, gated: no mobile / no reduced-motion / no WebGL →
+              nothing mounts; chunk loads post-idle so LCP is untouched).
+              One live GL context for ALL routes. Every motion is a pure
+              function of the scroll clocks («التمرير هو الزمن»): the
+              runes roam the whole screen and breathe large→small→large
+              with scrolling, and frameloop="demand" renders ZERO frames
+              once the user stops — a literal freeze, machine-checkable
+              via window.__elyraRuneDebug.frames. Route presets morph the
+              formation continuously (no remounts). z-[5]: above section
+              content, below navbar (50) / progress (60) / intro (80) /
+              grain (90) / cursor (200). pointer-events none +
+              aria-hidden — pure decoration (see rune/*). */}
+          <EdgeRune />
+          {/* R7-b — Sensory Polish Layer (app-wide, single instance each):
+              animated film grain + the difference-blend custom cursor
+              (dot + trailing ring, magnetic-hover growth, centered label
+              mode). CustomCursor lives INSIDE NextIntlClientProvider so its
+              label mode can fall back to the common.cursor.* catalog for
+              elements that carry only data-cursor (zoom / inspect /
+              external / rotate / drag / preview — Phase 5 WS-7 chips). */}
+          <GrainOverlay />
+          <CustomCursor />
+          {/* SOUND-2 — always-on ambient sound engine (renders nothing:
+              mounts the delegated hover/click listeners and arms the
+              AudioContext on the first user gesture; the mute toggle is
+              gone by design — see lib/sound.ts). */}
+          <AmbientSound />
+        </NextIntlClientProvider>
+        {/* F-S3-01 partial (audit r2): the sonner Toaster mounts lazily
+            after the first user gesture (LazyToaster) — toasts only ever
+            fire in response to user actions, so the chunk leaves the
+            initial critical path with zero UX change. */}
+        <LazyToaster
+          position="top-center"
+          richColors
+          closeButton
+          containerAriaLabel={tCommon('notifications')}
+          toastOptions={{ closeButtonAriaLabel: tCommon('close') }}
+        />
+      </body>
+    </html>
+  )
+}

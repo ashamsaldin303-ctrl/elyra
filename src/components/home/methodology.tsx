@@ -1,0 +1,212 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+import { motion, useScroll, useSpring, useTransform, useReducedMotion, type MotionValue } from 'framer-motion'
+import { useEffect, useRef } from 'react'
+import { Compass, PencilRuler, Hammer, Rocket, type LucideIcon } from 'lucide-react'
+import { SectionHeading } from '@/components/shared/section-heading'
+import { bindHeroScroll } from '@/lib/hero-scroll'
+import { useIsRtl } from '@/lib/use-rtl'
+import { cn } from '@/lib/utils'
+
+interface StepDef {
+  key: 'discover' | 'design' | 'build' | 'launch'
+  icon: LucideIcon
+}
+
+const STEPS: StepDef[] = [
+  { key: 'discover', icon: Compass },
+  { key: 'design', icon: PencilRuler },
+  { key: 'build', icon: Hammer },
+  { key: 'launch', icon: Rocket },
+]
+
+function MethodologyStep({
+  step,
+  index,
+  total,
+  progress,
+  reduced,
+}: {
+  step: StepDef
+  index: number
+  total: number
+  progress: MotionValue<number>
+  reduced: boolean | null
+}) {
+  const t = useTranslations('methodology')
+  const Icon = step.icon
+  const isRtl = useIsRtl()
+  const start = index / total
+  const end = (index + 1) / total
+  // R9 (user request — "cards stack and the text stops being readable
+  // because of the transparency"): the scroll-linked OPACITY fade (1 →
+  // 0.55) is GONE. When a card scrolls under the next sticky card its
+  // visible strip kept fading to ~55% — on text that read as broken
+  // contrast, not depth. Depth is carried by the opaque bg-card surface,
+  // the rail dot and the fan below, so every word stays fully readable
+  // throughout the stack.
+  //
+  // N4 (REF-3 T1) — deck fanning (Aardvark §5.1/§5.5): a card completing
+  // its scroll window now slides under the stack with a card-fan read
+  // instead of the old flat 1 → 0.965 uniform scale:
+  //   • scale cascade  Sᵢ = 1 − 0.045·(N−1−i)  — deeper cards shrink more
+  //     as they slide under (the LAST card ends at 1, the first at
+  //     ≈0.865 for N=4);
+  //   • rotation  θᵢ = (−1)ⁱ·3.5°·p over the SAME [start, end] window —
+  //     alternating tilt, with the physical sign mirrored for RTL
+  //     (locale 'ar') so the fan leans toward the reading direction.
+  //     θmax was raised 2.5° → 3.5° after two VLM critique rounds read
+  //     the Aardvark value as visually absent in the mid-stack capture
+  //     (a feature fresh eyes cannot perceive effectively doesn't ship);
+  //     3.5° also matches the N3 chip-dispersion magnitude — one
+  //     consistent "hand-placed" grammar across the tactile layer;
+  //   • transformOrigin 'center top' — the fan pivot per the plan.
+  // Both transforms are compositor-only, scroll-linked one-ways that
+  // consume the SAME shared W2-01 spring clock as the rail (one clock,
+  // no drift). The start-side gutter dot lives inside this article, so
+  // it rotates with the fanned card — intended: it reads as part of that
+  // card, and its ring keeps it visually anchored to the rail. Reduced
+  // motion → no style at all (static full-readability stack, house
+  // rule 3: reduced-motion = static final state).
+  const scale = useTransform(progress, [start, end], [1, 1 - 0.045 * (total - 1 - index)])
+  const tiltEnd = (index % 2 === 0 ? 3.5 : -3.5) * (isRtl ? -1 : 1)
+  const rotate = useTransform(progress, [start, end], [0, tiltEnd])
+
+  return (
+    <motion.article
+      style={reduced ? undefined : { scale, rotate, transformOrigin: 'center top' }}
+      className={cn(
+        'relative rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-10',
+        'sticky top-24',
+      )}
+    >
+      {/* UI-5: timeline dot on the start-side rail. The oversized step
+          number's clip moved to an inner box (below) so this dot can hang
+          OUTSIDE the card, in the stack's start gutter, centered on the
+          rail. Aligns with the icon row: p-6 + 28px ≈ top-13 (mobile) /
+          p-10 + 28px ≈ top-17 (sm+). The ring punches it through the rail. */}
+      <span
+        aria-hidden="true"
+        className="absolute -start-6 top-13 size-2.5 rounded-full bg-primary ring-4 ring-background sm:-start-8 sm:top-17"
+      />
+      {/* Same corner-bleed clip the article's own overflow-hidden used to
+          provide — now scoped to a box with identical bounds/rounding so
+          the article can host the gutter dot without clipping it.
+          pointer-events-none keeps the inset-0 box inert (the original
+          number span carried it too). */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl"
+      >
+        <span
+          className="absolute -end-4 -top-4 text-[120px] font-bold leading-none text-primary/10 sm:text-[160px]"
+        >
+          {String(index + 1).padStart(2, '0')}
+        </span>
+      </span>
+      <div className="relative grid gap-6 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+        <div className="flex size-14 items-center justify-center rounded-2xl border border-primary/25 bg-primary/10 text-signal">
+          <Icon className="size-7" aria-hidden="true" />
+        </div>
+        <div>
+          <div className="flex flex-wrap items-center gap-3">
+            <h3 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              {t(`steps.${step.key}.title`)}
+            </h3>
+            <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary-strong">
+              {t(`steps.${step.key}.duration`)}
+            </span>
+          </div>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
+            {t(`steps.${step.key}.desc`)}
+          </p>
+        </div>
+        {/* L3 FIX (R3): decorative flow glyph — aria-hidden so SR users don't
+            hear a contextless "down arrow" / "check mark" per step. */}
+        <div
+          aria-hidden="true"
+          className="hidden size-16 items-center justify-center rounded-full border border-dashed border-border text-xs text-muted-foreground sm:flex"
+        >
+          {index < total - 1 ? '↓' : '✓'}
+        </div>
+      </div>
+    </motion.article>
+  )
+}
+
+export function Methodology() {
+  const t = useTranslations('methodology')
+  const reduced = useReducedMotion()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start 20%', 'end 60%'],
+  })
+  // W2-01 (plan §2 — scrub:1 translation): ONE shared spring smoothing the
+  // raw scroll progress. The rail, the stacked cards and the 3D camera
+  // bridge below all consume this SINGLE clock, so they can never drift
+  // apart (§5-5: changing these coefficients requires a documented
+  // decision — separate values would de-sync the three systems). The
+  // reduced-motion path is deliberately unchanged: the spring still exists
+  // but nothing consumes it there (static full rail, cards without style).
+  const smooth = useSpring(scrollYProgress, { stiffness: 100, damping: 30, mass: 0.5 })
+  // 4-I4 (Batch 3 item 15): one-way bridge — feed this section's SMOOTHED
+  // scroll progress (the shared W2-01 spring — the same clock the rail and
+  // cards use) to the hero canvas camera dolly (bound in an effect so no
+  // module state is touched during render; unbinds on unmount).
+  useEffect(() => bindHeroScroll(smooth), [smooth])
+
+  return (
+    <section className="bg-background py-20 sm:py-28" aria-labelledby="method-title">
+      <div className="elyra-container max-w-container">
+        <SectionHeading
+          sec="MOD · PROCESS"
+          kicker={t('kicker')}
+          title={t('title')}
+          subtitle={t('subtitle')}
+          titleId="method-title"
+        />
+        {/* `relative` anchors the framer-motion scroll offsets (useScroll
+            warns when the container is statically positioned). The ref'd
+            wrapper boxes the steps AND the rail, so their heights match
+            and scrollYProgress semantics are unchanged. */}
+        <div ref={containerRef} className="relative mt-14">
+          {/* UI-5: vertical progress rail on the START side (logical
+              inset — flips with RTL). Track is a hairline; the fill is a
+              scaleY transform on the same shared spring the cards use
+              (W2-01 — one clock, no extra listeners). Reduced motion →
+              static full line. */}
+          <div
+            aria-hidden="true"
+            className="absolute bottom-0 start-0 top-0 w-0.5 rounded-full bg-border"
+          >
+            {reduced ? (
+              <div className="h-full w-full origin-top rounded-full bg-gradient-to-b from-primary via-primary/70 to-primary/30" />
+            ) : (
+              <motion.div
+                className="h-full w-full origin-top rounded-full bg-gradient-to-b from-primary via-primary/70 to-primary/30"
+                style={{ scaleY: smooth }}
+              />
+            )}
+          </div>
+          {/* Start-side gutter hosts the rail + per-card dots; sticky
+              containment is preserved — the steps' direct parent box is
+              geometrically identical to the previous single stack. */}
+          <div className="space-y-4 ps-5 sm:space-y-6 sm:ps-7">
+            {STEPS.map((step, i) => (
+              <MethodologyStep
+                key={step.key}
+                step={step}
+                index={i}
+                total={STEPS.length}
+                progress={smooth}
+                reduced={reduced}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}

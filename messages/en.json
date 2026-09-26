@@ -1,0 +1,1650 @@
+{
+  "meta": {
+    "siteName": "Elyra",
+    "tagline": "Where exceptional digital experiences are born",
+    "title": "Elyra — Stunning Websites & n8n Automation Systems",
+    "description": "Elyra crafts beautiful websites, interactive 3D experiences and intelligent n8n automation. Get an instant estimate with our project calculator.",
+    "websites": {
+      "title": "Professional Website Building",
+      "description": "Company sites, e-commerce stores and SaaS platforms with a beauty of our own and outstanding performance, plus interactive 3D experiences."
+    },
+    "automation": {
+      "title": "n8n Automation Systems",
+      "description": "Connect your tools and automate your operations: CRM integrations, invoicing, instant alerts and AI agents — through 422+ ready integrations."
+    },
+    "work": {
+      "title": "Our Work",
+      "description": "Selected website and automation projects we have built — results that speak in numbers."
+    },
+    "about": {
+      "title": "About Us",
+      "description": "Discover Elyra’s story, team and values: beauty, precision, and automation that serves people."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "Tell us about your project and we'll come back with a clear budget and timeline estimate."
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "websites": "Website Building",
+    "automation": "Automation",
+    "work": "Work",
+    "about": "About",
+    "contact": "Contact",
+    "cta": "Start Your Project",
+    "ariaLabel": "Main navigation",
+    "openMenu": "Open main menu",
+    "closeMenu": "Close menu",
+    "switchLocale": "عربي",
+    "switchLocaleLabel": "Switch to Arabic",
+    "skipToContent": "Skip to main content",
+    "languageToggleCompact": "Switch language"
+  },
+  "hero": {
+    "badge": "Digital Agency · Websites & Automation",
+    "titleTop": "Websites That",
+    "titleAccent": "Perform",
+    "titleBottom": "And Systems Run",
+    "subtitle": "Elyra is a digital agency specializing in beautifully designed websites, interactive 3D experiences, and intelligent n8n automation.",
+    "ctaPrimary": "Start Your Project",
+    "ctaSecondary": "See Our Work",
+    "scroll": "Scroll to explore",
+    "location": "Damascus",
+    "watermark": "ELYRA",
+    "marquee": [
+      "Stunning websites",
+      "Immersive 3D",
+      "Intelligent n8n automation",
+      "AI agents that work for you",
+      "Stores that sell more",
+      "90+ Lighthouse performance",
+      "Design with a signature"
+    ]
+  },
+  "manifesto": {
+    "kicker": "Philosophy",
+    "body": "We don’t build pages to be browsed — we build moments to be told. Every pixel is deliberate, every motion carries meaning; because beauty isn’t decoration, it’s the shortest path to trust.",
+    "signature": "— Elyra"
+  },
+  "stats": {
+    "kicker": "Why Elyra",
+    "title": "Numbers We’re Proud Of",
+    "projects": {
+      "value": 120,
+      "suffix": "+",
+      "label": "Projects Delivered"
+    },
+    "hours": {
+      "value": 4800,
+      "suffix": "",
+      "label": "Hours Saved Monthly for Clients"
+    },
+    "satisfaction": {
+      "value": 98,
+      "suffix": "%",
+      "label": "Client Satisfaction Rate"
+    },
+    "integrations": {
+      "value": 422,
+      "suffix": "+",
+      "label": "Ready Integrations via n8n"
+    }
+  },
+  "bento": {
+    "kicker": "What We Build",
+    "title": "Two Service Lines, a World of Possibilities",
+    "subtitle": "We build your digital presence from scratch, then automate everything after it — so you can focus on what truly matters.",
+    "websites": {
+      "title": "Stunning Websites",
+      "desc": "Company sites, stores and platforms engineered to our own standards: purity in form, depth in experience.",
+      "features": [
+        "100% Custom Design",
+        "90+ Lighthouse Performance",
+        "Bilingual AR/EN",
+        "Interactive 3D Experiences"
+      ],
+      "mini": {
+        "title": "Try the Site Identity",
+        "hint": "Click any color — buttons, links and cards restyle instantly",
+        "brand": "Lamsa",
+        "nav": [
+          "New In",
+          "Women",
+          "Accessories"
+        ],
+        "search": "Search for a piece…",
+        "kicker": "Autumn 2025 Collection",
+        "heroTitle": "Quiet elegance, precise details",
+        "heroSub": "Natural fabrics and lasting tailoring — pieces made to stay.",
+        "heroCta": "Shop the Collection",
+        "heroLink": "View the Lookbook",
+        "viewers": "122 people viewing now",
+        "addToCart": "Add",
+        "palette": [
+          "Cobalt",
+          "Emerald",
+          "Coral",
+          "Sky"
+        ],
+        "activeLabel": "Current identity",
+        "products": [
+          {
+            "name": "Wool Coat",
+            "price": "$349",
+            "old": "$429"
+          },
+          {
+            "name": "Leather Bag",
+            "price": "$289",
+            "old": "$359"
+          },
+          {
+            "name": "Cashmere Scarf",
+            "price": "$119",
+            "old": "$149"
+          }
+        ],
+        "footer": "© 2025 Lamsa — All rights reserved"
+      }
+    },
+    "automation": {
+      "title": "n8n Automation Systems",
+      "desc": "Connect your tools and leave the routine to us: invoices that issue themselves, alerts that arrive instantly.",
+      "mini": {
+        "title": "Run the Flow",
+        "hint": "Click to watch the pulse cross the three nodes",
+        "done": "Done! That’s automation at work",
+        "nodes": [
+          "Receive order",
+          "Validate & log",
+          "Notify team"
+        ],
+        "saved": "Saved 12 minutes of manual work",
+        "runs": "Run complete"
+      }
+    },
+    "threeD": {
+      "title": "3D Experiences",
+      "desc": "Interactive WebGL scenes that tell your brand’s story and keep visitors exploring.",
+      "mini": {
+        "hint": "Drag the cube to rotate it",
+        "idle": "or leave it — it spins on its own"
+      }
+    },
+    "ai": {
+      "title": "AI Agents",
+      "desc": "Intelligent assistants that answer your customers, organize your schedule, and extract insights from messy files.",
+      "mini": {
+        "prompt": "Summarize yesterday’s meeting",
+        "hint": "Click the question to try the agent",
+        "retryHint": "Click again for a different answer",
+        "responses": [
+          "3 key decisions, 2 assigned tasks, and a deadline set for next Thursday. Summary sent to your team ✓",
+          "The gist: campaign launches on the 12th, next quarter’s budget is up 15%, and you own the deck ✓",
+          "One unresolved point: pricing — deferred to Thursday’s session. 3 action items dispatched to owners ✓",
+          "47-minute meeting, 5 participants. Highlights: response time cut to 4 hours and a designer to hire ✓",
+          "Logged 6 potential risks ranked by impact, each with a mitigation draft in the shared doc ✓",
+          "Client’s key note: loves the new direction but wants a darker variant — revised draft ready for approval ✓"
+        ],
+        "inputPlaceholder": "Type your question here…",
+        "convertCta": "Turn this into a request"
+      }
+    },
+    "integrations": {
+      "title": "422+ Integrations",
+      "desc": "We connect your tools together, whatever they are — from spreadsheets to CRM systems.",
+      "mini": {
+        "hint": "Ready integrations — counted live"
+      }
+    }
+  },
+  "simulator": {
+    "kicker": "Automation... Live",
+    "title": "Watch n8n Work, Moment by Moment",
+    "subtitle": "A real simulation of a flow we build for clients: from the moment an order arrives until your team gets notified — all in under two seconds.",
+    "run": "Try It Now",
+    "replay": "Replay",
+    "running": "Flow is running...",
+    "completed": "Flow completed in {seconds} seconds",
+    "stepOf": "Step {current} of {total}",
+    "idle": "Ready to run — click the button to start the simulation",
+    "scrollHint": "Scroll horizontally to see the full scene",
+    "scenarios": {
+      "newOrder": {
+        "label": "New Project Request",
+        "steps": {
+          "receive": {
+            "title": "Order Received",
+            "desc": "A new request arrives from the website form to the secure intake endpoint.",
+            "ms": 85
+          },
+          "validate": {
+            "title": "Validate & Store",
+            "desc": "Instant data validation, then the order is saved to the database.",
+            "ms": 140
+          },
+          "crm": {
+            "title": "CRM Update",
+            "desc": "The client is automatically added to the CRM and the pipeline board updates.",
+            "ms": 230
+          },
+          "email": {
+            "title": "Welcome Email",
+            "desc": "A personalized welcome message is sent with the order summary and next steps.",
+            "ms": 310
+          },
+          "telegram": {
+            "title": "Telegram Alert",
+            "desc": "An instant Telegram notification reaches the team to reply within minutes.",
+            "ms": 95
+          }
+        }
+      },
+      "paymentReminder": {
+        "label": "Payment Reminder",
+        "steps": {
+          "invoice": {
+            "title": "Invoice Due",
+            "desc": "The system detects an invoice that reached its due date unpaid.",
+            "ms": 90
+          },
+          "schedule": {
+            "title": "Schedule Reminder",
+            "desc": "A courteous reminder is scheduled according to the follow-up policy.",
+            "ms": 120
+          },
+          "email": {
+            "title": "Reminder Email",
+            "desc": "An elegant reminder email is sent with a direct payment link.",
+            "ms": 260
+          },
+          "telegram": {
+            "title": "Internal Alert",
+            "desc": "An instant Telegram notification informs the finance team.",
+            "ms": 85
+          },
+          "update": {
+            "title": "Status Update",
+            "desc": "The reminder status is logged to prevent duplicates.",
+            "ms": 110
+          }
+        }
+      },
+      "weeklyReport": {
+        "label": "Weekly Report",
+        "steps": {
+          "trigger": {
+            "title": "Report Time",
+            "desc": "A weekly timer triggers the flow every Sunday at 9 AM.",
+            "ms": 70
+          },
+          "collect": {
+            "title": "Collect Data",
+            "desc": "Numbers are pulled automatically from the database and sales systems.",
+            "ms": 380
+          },
+          "analyze": {
+            "title": "Generate Insights",
+            "desc": "Growth is calculated and compared with last week, surfacing key changes.",
+            "ms": 290
+          },
+          "report": {
+            "title": "Send Report",
+            "desc": "An elegant email with an executive summary, readable in two minutes.",
+            "ms": 240
+          },
+          "notify": {
+            "title": "Team Notification",
+            "desc": "A Telegram message with the report’s top three takeaways.",
+            "ms": 90
+          }
+        }
+      }
+    },
+    "logTitle": "Live Execution Log",
+    "flowComplete": "flow complete",
+    "awaiting": "// awaiting trigger...",
+    "stats": {
+      "total": "Total time",
+      "steps": "Steps",
+      "status": "Status"
+    },
+    "state": {
+      "idle": "Idle",
+      "running": "Running",
+      "completed": "Completed"
+    },
+    "completionTitle": "Ready for a flow that serves your business?",
+    "completionCta": "Order a similar system"
+  },
+  "workSection": {
+    "kicker": "Selected Work",
+    "title": "Before & After — The Difference We Make",
+    "subtitle": "Drag the divider and compare for yourself how digital experiences transform.",
+    "dragHint": "Drag to compare",
+    "before": "Before",
+    "after": "After",
+    "viewAll": "Browse All Work",
+    "project1": {
+      "title": "Lamsa Fashion Store",
+      "category": "E-commerce Store",
+      "desc": "From a dull template store to a luxury shopping experience that feels like a boutique.",
+      "metrics": [
+        "+140% Conversion Rate",
+        "×2.3 Loading Speed"
+      ],
+      "mock": {
+        "brand": "Lamsa",
+        "kicker": "Autumn 2025 Collection",
+        "title": "Quiet elegance, precise details",
+        "sub": "Natural fabrics and lasting tailoring — pieces made to stay.",
+        "cta": "Shop the Collection",
+        "cards": [
+          {
+            "name": "Wool Coat",
+            "price": "$349",
+            "old": "$429"
+          },
+          {
+            "name": "Leather Bag",
+            "price": "$289",
+            "old": "$359"
+          },
+          {
+            "name": "Cashmere Scarf",
+            "price": "$119",
+            "old": "$149"
+          }
+        ]
+      }
+    },
+    "project2": {
+      "title": "Aqar Plus Platform",
+      "category": "Real Estate Platform",
+      "desc": "A cluttered listings board became a smooth discovery platform with interactive maps.",
+      "metrics": [
+        "+85% Organic Visits",
+        "60% Longer Sessions"
+      ],
+      "mock": {
+        "brand": "Aqar Plus"
+      }
+    },
+    "scenes": {
+      "site": {
+        "announce": "Free shipping over $200 • 30-day returns",
+        "domain": "lamssa.sy",
+        "nav": [
+          "New In",
+          "Browse",
+          "Trending"
+        ],
+        "search": "Search…",
+        "viewers": "122 people viewing now",
+        "addToCart": "Add",
+        "rating": "4.8",
+        "products": [
+          {
+            "rating": "4.9",
+            "reviews": "312 reviews"
+          },
+          {
+            "rating": "4.7",
+            "reviews": "96 reviews"
+          },
+          {
+            "rating": "4.8",
+            "reviews": "187 reviews"
+          }
+        ],
+        "footerLinks": [
+          "Support",
+          "Shipping",
+          "Returns",
+          "Contact"
+        ],
+        "footerNote": "All rights reserved",
+        "categories": [
+          "Bestsellers",
+          "New arrivals",
+          "Offers",
+          "Full collections"
+        ],
+        "trust": [
+          "Express 48h delivery",
+          "Secure encrypted payment",
+          "Free 30-day returns",
+          "Around-the-clock support"
+        ],
+        "payments": [
+          "VISA",
+          "Mastercard",
+          "Mada",
+          "Apple Pay"
+        ],
+        "socialProof": "+2,400 verified customers",
+        "newBadge": "NEW"
+      },
+      "old": {
+        "announce": "*** SPECIAL OFFERS!!! UP TO 70% OFF — HURRY BEFORE IT ENDS ***",
+        "welcome": "Welcome to our humble website...",
+        "clickHere": "CLICK HERE!!!",
+        "counter": "Visitors: 004217",
+        "bestViewed": "Best viewed in Internet Explorer 6 at 800×600",
+        "construction": "Page under construction 🚧 coming soon!",
+        "slogan": "You deserve the best since 1998",
+        "adSpace": "Ad space",
+        "adTag": "AD",
+        "tickerTag": "NEW",
+        "pollTitle": "Site poll",
+        "pollVotes": "1,240 votes so far",
+        "newsTitle": "Latest news",
+        "friendsTitle": "Friendly sites",
+        "credit": "Design & code: Sham Tech Network",
+        "store": {
+          "fallbackBrand": "Al-Sham Trading Co.",
+          "nav": [
+            "Home",
+            "Products",
+            "About Us",
+            "Contact",
+            "Links",
+            "Sitemap"
+          ],
+          "ticker": "Welcome to our official website — special offers for a limited time — to book or get in touch, call the phone numbers at the bottom of the page",
+          "categoriesTitle": "Site sections",
+          "categories": [
+            "Home",
+            "About us",
+            "Products",
+            "Offers",
+            "News",
+            "Contact"
+          ],
+          "pollQ": "Do you like our design?",
+          "pollYes": "Yes, great",
+          "pollNo": "No",
+          "productsTitle": "Featured products",
+          "orderNow": "Order now",
+          "items": [
+            "Product No. 1",
+            "Product No. 2",
+            "Product No. 3"
+          ],
+          "news": [
+            "12/03 — products page updated with summer offers",
+            "05/03 — a new collection has just arrived",
+            "28/02 — our 10th anniversary, 10% off"
+          ],
+          "friends": [
+            "Arabic web directory",
+            "Discussion forums",
+            "Download center"
+          ]
+        },
+        "property": {
+          "fallbackBrand": "Al-Amana Realty Office",
+          "nav": [
+            "Home",
+            "For Sale",
+            "For Rent",
+            "Offices",
+            "Land",
+            "Contact"
+          ],
+          "ticker": "New housing offers in Mazzeh and Bloudan — stamped prices for a limited time — for viewing call our office or email us",
+          "categoriesTitle": "Browse districts",
+          "categories": [
+            "Damascus - Mazzeh",
+            "Rif Dimashq - Bloudan",
+            "Aleppo - Shahbaa",
+            "Latakia - American",
+            "Homs - Waer"
+          ],
+          "pollQ": "Buying or renting this year?",
+          "pollYes": "Buying",
+          "pollNo": "Renting",
+          "productsTitle": "Latest listings",
+          "orderNow": "Details",
+          "items": [
+            "140m² apartment - Mazzeh",
+            "Furnished villa - Bloudan",
+            "Commercial office - Business"
+          ],
+          "news": [
+            "12/03 — villa prices in Bloudan down 5%",
+            "05/03 — Mazzeh Tower opens pre-sales",
+            "28/02 — first-time buyer guide: 10 tips"
+          ],
+          "friends": [
+            "Syrian realty directory",
+            "Brokerage forum",
+            "Housing news"
+          ]
+        },
+        "academy": {
+          "fallbackBrand": "Al-Nour Training Academy",
+          "nav": [
+            "Home",
+            "Courses",
+            "Instructors",
+            "Certificates",
+            "Enroll",
+            "Contact"
+          ],
+          "ticker": "Enrollment open for the new term courses — limited seats — book yours via the form or the admin numbers",
+          "categoriesTitle": "Academy sections",
+          "categories": [
+            "Design courses",
+            "Programming courses",
+            "Business",
+            "Languages & skills",
+            "Free courses"
+          ],
+          "pollQ": "Do you prefer remote learning?",
+          "pollYes": "Yes, remote",
+          "pollNo": "In person",
+          "productsTitle": "Most requested courses",
+          "orderNow": "Enroll",
+          "items": [
+            "Design fundamentals",
+            "Digital marketing",
+            "Project management"
+          ],
+          "news": [
+            "12/03 — April diploma enrollment open",
+            "05/03 — free workshop: build your portfolio",
+            "28/02 — three students win an Arab competition"
+          ],
+          "friends": [
+            "Education gateway",
+            "National training center",
+            "Tech magazine"
+          ]
+        },
+        "dining": {
+          "fallbackBrand": "Beit Al-Sham Restaurant",
+          "nav": [
+            "Home",
+            "Menu",
+            "Reservations",
+            "Delivery",
+            "About",
+            "Contact"
+          ],
+          "ticker": "New! delivery to all neighborhoods — order via the numbers at the bottom of the page — 10% off first orders",
+          "categoriesTitle": "Taste sections",
+          "categories": [
+            "Grills",
+            "Starters",
+            "Pastries",
+            "Desserts",
+            "Drinks"
+          ],
+          "pollQ": "What is our best dish?",
+          "pollYes": "Grills",
+          "pollNo": "Pastries",
+          "productsTitle": "Kitchen dishes",
+          "orderNow": "Order it",
+          "items": [
+            "Mixed grill platter",
+            "Cheese pastries",
+            "Pistachio baklava"
+          ],
+          "news": [
+            "12/03 — Damascene desserts section opens",
+            "05/03 — big family offer returns every Thursday",
+            "28/02 — our 10th anniversary, 15% off"
+          ],
+          "friends": [
+            "Restaurant directory",
+            "Chefs forum",
+            "Taste magazine"
+          ]
+        }
+      },
+      "dash": {
+        "nav": [
+          "Overview",
+          "Operations",
+          "Customers",
+          "Reports",
+          "Settings"
+        ],
+        "welcome": "Good evening, Zeinab",
+        "search": "Search everything…",
+        "notifications": "3 new notifications",
+        "live": "LIVE",
+        "kpis": [
+          {
+            "label": "Monthly revenue",
+            "value": "$48,250",
+            "delta": "+18%"
+          },
+          {
+            "label": "Completed ops",
+            "value": "342",
+            "delta": "+9%"
+          },
+          {
+            "label": "Needs follow-up",
+            "value": "12",
+            "delta": "−41%",
+            "lowerIsBetter": true
+          },
+          {
+            "label": "New customers",
+            "value": "67",
+            "delta": "+23%"
+          }
+        ],
+        "chartTitle": "Performance — last 12 months",
+        "tableTitle": "Latest operations",
+        "tableHead": [
+          "Ref",
+          "Party",
+          "Amount",
+          "Status"
+        ],
+        "rows": [
+          {
+            "ref": "#OP-1043",
+            "party": "Al-Amal Co.",
+            "amount": "$1,240",
+            "status": "Completed"
+          },
+          {
+            "ref": "#OP-1042",
+            "party": "Al-Nour Est.",
+            "amount": "$890",
+            "status": "Pending"
+          },
+          {
+            "ref": "#OP-1041",
+            "party": "Lamsa Store",
+            "amount": "$2,150",
+            "status": "Completed"
+          }
+        ],
+        "range": [
+          "7 days",
+          "30 days",
+          "12 months"
+        ],
+        "storage": "Storage",
+        "storageValue": "7.2 GB / 10 GB",
+        "viewAll": "View all",
+        "role": "Account manager"
+      },
+      "oldDash": {
+        "file": "sales_v2_FINAL_really_final.xls",
+        "formula": "=SUM(C2:C14)",
+        "warning": "Warning: 3 rows contain errors — unsaved changes!",
+        "cols": [
+          "Date",
+          "Customer",
+          "Amount",
+          "Status"
+        ],
+        "status": "Pending?",
+        "menubar": [
+          "File",
+          "Edit",
+          "View",
+          "Insert",
+          "Format",
+          "Tools",
+          "Data",
+          "Help"
+        ],
+        "sheets": [
+          "Sheet1",
+          "Sheet2",
+          "Sheet3"
+        ],
+        "ready": "Ready"
+      },
+      "property": {
+        "domain": "aqarplus.sy",
+        "budget": "Under $50k",
+        "searchPlaceholder": "Search by district or city…",
+        "searchBtn": "Search",
+        "filters": [
+          "Buy",
+          "Rent",
+          "Apartments",
+          "Villas",
+          "Offices",
+          "Land"
+        ],
+        "results": "128 matching listings",
+        "beds": "bd",
+        "baths": "ba",
+        "area": "m²",
+        "forSale": "For Sale",
+        "priceCut": "Price cut",
+        "featuredTitle": "Agent of the week",
+        "featuredName": "Rim Haddad",
+        "featuredRole": "Certified agent · 214 deals",
+        "stats": [
+          "+1,240 listings",
+          "Verified agent",
+          "360° virtual tour"
+        ],
+        "newBadge": "New",
+        "contact": "Contact",
+        "footerNote": "All rights reserved"
+      },
+      "academy": {
+        "domain": "masar.ac",
+        "nav": [
+          "Home",
+          "Courses",
+          "Tracks",
+          "Certificates"
+        ],
+        "enroll": "Enroll Now",
+        "yourProgress": "Your course progress",
+        "rating": "4.6",
+        "students": "+8,200 students",
+        "reviews": "(2,340 reviews)",
+        "preview": "Free preview",
+        "lecture": "Trial lesson — try before enrolling",
+        "duration": "12:40",
+        "module": "Module",
+        "lessons": "12 lessons",
+        "instructorName": "Lina Al-Ali",
+        "instructorRole": "Certified UI/UX instructor",
+        "certificate": "Accredited certificate on completion",
+        "level": "Beginner level",
+        "footerNote": "All rights reserved"
+      },
+      "dining": {
+        "domain": "baitalsham.com",
+        "nav": [
+          "Home",
+          "Menu",
+          "Reservations",
+          "Delivery",
+          "About"
+        ],
+        "rating": "4.7",
+        "reviewsCount": "+940 reviews",
+        "delivery": "Delivery within 30 minutes",
+        "minOrder": "$8 minimum",
+        "openHours": "Open daily 12pm – 12am",
+        "menuTabs": [
+          "Grill",
+          "Starters",
+          "Desserts"
+        ],
+        "orderDish": "Add",
+        "reserve": "Book a table",
+        "guests": "4 guests",
+        "dateTime": "Today · 8:30 pm",
+        "footerNote": "All rights reserved"
+      },
+      "kanban": {
+        "ops": "Operations",
+        "nav": [
+          "Projects board",
+          "Briefs",
+          "Tasks",
+          "Reports",
+          "Archive"
+        ],
+        "greeting": "Good evening, Zeinab",
+        "search": "Search everything…",
+        "newBrief": "New brief",
+        "capacity": "Capacity",
+        "capacityValue": "4/6",
+        "columns": [
+          {
+            "title": "Brief",
+            "badge": "Awaiting triage",
+            "cards": [
+              {
+                "client": "Zaytoun Restaurant",
+                "task": "New identity",
+                "chip": "Due: Nov 14"
+              },
+              {
+                "client": "Nabq Store",
+                "task": "Storefront design",
+                "chip": "Due: Nov 16"
+              }
+            ]
+          },
+          {
+            "title": "In Design",
+            "badge": "In progress",
+            "cards": [
+              {
+                "client": "Al-Wafa Bank",
+                "task": "Website UI",
+                "chip": "Due: Nov 18"
+              },
+              {
+                "client": "Tamam Clinics",
+                "task": "Booking app",
+                "chip": "Due: Nov 20"
+              },
+              {
+                "client": "Al-Mada Co.",
+                "task": "Pitch deck",
+                "chip": "Due: Nov 22"
+              }
+            ]
+          },
+          {
+            "title": "Client Review",
+            "badge": "With client",
+            "cards": [
+              {
+                "client": "Dar Café",
+                "task": "Coffee packaging",
+                "chip": "3 comments · 2 days ago"
+              },
+              {
+                "client": "Ruwad Academy",
+                "task": "Platform site",
+                "chip": "5 comments · 3 days ago"
+              }
+            ]
+          },
+          {
+            "title": "Ready to Deliver",
+            "badge": "Approved",
+            "cards": [
+              {
+                "client": "Arwad Hotel",
+                "task": "Brand guide",
+                "chip": "Delivery: Nov 10 · PDF 2.4 MB"
+              },
+              {
+                "client": "Sanabela Bakery",
+                "task": "Full identity",
+                "chip": "Delivery: Nov 12 · PDF 1.8 MB"
+              }
+            ]
+          }
+        ],
+        "intakeTitle": "Brief title",
+        "intakeClient": "Choose client",
+        "intakeBudget": "$1,240 – $3,000",
+        "intakeDeadline": "Deadline",
+        "intakeAdd": "Add to briefs"
+      }
+    }
+  },
+  "methodology": {
+    "kicker": "How We Work",
+    "title": "A Clear Journey, From Idea to Launch",
+    "subtitle": "A four-step methodology proven across 120+ projects — no surprises, no guesswork.",
+    "steps": {
+      "discover": {
+        "title": "Discovery",
+        "duration": "Week 1",
+        "desc": "A deep listening session: we understand your goals, audience and competitors, then scope the work precisely."
+      },
+      "design": {
+        "title": "Design",
+        "duration": "Weeks 2–3",
+        "desc": "We craft the identity and full experience before writing a single line of code — you see your site before it’s built."
+      },
+      "build": {
+        "title": "Build",
+        "duration": "Weeks 3–6",
+        "desc": "Weekly review cycles: experience progress early with a transparent, step-by-step process. Then two protected weeks of polish for the fine details before launch — within the total duration, not on top of it."
+      },
+      "launch": {
+        "title": "Launch & Support",
+        "duration": "Ongoing",
+        "desc": "A safe launch with performance monitoring, then continuous improvement — we don’t leave after opening day."
+      }
+    }
+  },
+  "testimonials": {
+    "rating": "Rated 5 out of 5 stars",
+    "items": {
+      "first": {
+        "quote": "I asked for a website and received a complete digital brand. Within three months of launch, conversion was up 140% and cart abandonment dropped by nearly half. The team never asks “what do you want?” — they ask “what should your customer feel?” That changed everything.",
+        "name": "Reem Al-Halabi",
+        "role": "Founder",
+        "company": "Lamsa Store"
+      }
+    }
+  },
+  "calculator": {
+    "kicker": "Project Calculator",
+    "title": "How Much Does Your Project Cost? Find Out in a Minute",
+    "subtitle": "Customize your project step by step and get an instant budget and timeline estimate.",
+    "step": "Step {current} of {total}",
+    "steps": {
+      "service": "Service Type"
+    },
+    "services": {
+      "website": {
+        "title": "Luxury Website",
+        "desc": "A striking digital presence with an unforgettable experience"
+      },
+      "automation": {
+        "title": "Automation System",
+        "desc": "Connect your tools and automate daily routine with n8n"
+      },
+      "full": {
+        "title": "Full Ecosystem",
+        "desc": "Website + automation + AI agents in one system",
+        "popular": "Most Requested"
+      }
+    },
+    "pages": "Number of Pages",
+    "pagesValue": "{count, plural, one {# page} other {# pages}}",
+    "languages": "Languages",
+    "languagesOptions": {
+      "single": "Arabic only",
+      "bilingual": "Arabic + English"
+    },
+    "threeD": "3D Experience",
+    "threeDOptions": {
+      "yes": "Yes, add the wow factor",
+      "no": "No, simplicity is enough"
+    },
+    "integrations": "Required Integrations",
+    "integrationsOptions": {
+      "crm": "CRM",
+      "invoicing": "Invoicing",
+      "email": "Automated Email",
+      "telegram": "Telegram",
+      "sheets": "Spreadsheets",
+      "ai": "AI Agent"
+    },
+    "automationLevel": "Automation Level",
+    "automationLevelOptions": {
+      "essential": "Essential — alerts and simple connections",
+      "advanced": "Advanced — smart workflows and AI agents"
+    },
+    "dependsHint": "This option depends on the service type you chose in the previous step",
+    "result": {
+      "budget": "Estimated Budget",
+      "duration": "Timeline",
+      "weeks": "From {min} to {max} weeks",
+      "breakdownTitle": "Estimate Breakdown",
+      "disclaimer": "This estimate is indicative and will be refined for free after the discovery session. It covers implementation only — running costs (hosting and maintenance) are discussed in the discovery session and typically run 10–20% of the build cost per year. Our 3D option is a focused hero moment, not a full WebGL world — which is why it stays within a reasonable budget.",
+      "base": "Base Service",
+      "pages": "Extra Pages",
+      "bilingual": "Bilingual",
+      "threeD": "3D Experience",
+      "integrations": "Integrations",
+      "advanced": "Advanced Automation"
+    },
+    "form": {
+      "title": "Where Should We Send the Details?",
+      "name": "Full Name",
+      "email": "Email Address",
+      "whatsapp": "WhatsApp Number (optional)",
+      "submit": "Send Project Request",
+      "sending": "Sending…",
+      "successTitle": "We’ve Received Your Request!",
+      "successDesc": "Our team will contact you within 24 business hours with the final estimate details.",
+      "successRestart": "Calculate Another Project",
+      "errorTitle": "Couldn’t submit your request",
+      "errorNetwork": "Check your connection and try again — your data is preserved.",
+      "successReference": "Your reference:"
+    },
+    "errors": {
+      "name": "Name is required (at least 2 characters)",
+      "email": "Please enter a valid email address"
+    },
+    "back": "Back",
+    "next": "Next",
+    "calculate": "Calculate Estimate"
+  },
+  "footer": {
+    "tagline": "We craft digital experiences that resemble the future — stunning websites and automation systems that work while you sleep.",
+    "availability": "Available for New Projects",
+    "localTime": "Your Local Time",
+    "quickLinks": "Quick Links",
+    "servicesTitle": "Our Services",
+    "connectTitle": "Connect With Us",
+    "rights": "© {year} Elyra. All rights reserved.",
+    "madeWith": "Crafted with passion and a lot of coffee",
+    "social": {
+      "telegram": "Telegram",
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "github": "GitHub"
+    },
+    "websitesLink": "Professional Website Building",
+    "automationLink": "n8n Automation Systems"
+  },
+  "pages": {
+    "websites": {
+      "hero": {
+        "kicker": "Services · Website Building",
+        "title": "Websites Built",
+        "titleAccent": "to Dazzle",
+        "subtitle": "From the elegant company site to the feature-rich platform — we design and build websites with Apple’s purity standards and Google’s performance.",
+        "cta": "Calculate Your Website Budget"
+      },
+      "types": {
+        "kicker": "Three Types",
+        "title": "The Same Level of Detail Madness",
+        "landing": {
+          "title": "Company Website",
+          "desc": "An elegant presence that tells your story and converts visitors into clients.",
+          "features": [
+            "Fully Polished Pages",
+            "Search Engine Optimization",
+            "Blazing Fast Loading",
+            "Easy Admin Panel"
+          ]
+        },
+        "store": {
+          "title": "E-commerce Store",
+          "desc": "A store that sells with beauty as much as with ease.",
+          "features": [
+            "Cart & Secure Checkout",
+            "Smart Inventory Management",
+            "Mobile-first Experience",
+            "Live Sales Reports"
+          ]
+        },
+        "platform": {
+          "title": "Platform / SaaS",
+          "desc": "Your digital product, from idea to real users.",
+          "features": [
+            "Secure Accounts & Auth",
+            "Live Dashboards & Data",
+            "Subscription System",
+            "Full Scalability"
+          ]
+        }
+      },
+      "threeD": {
+        "kicker": "3D Capabilities",
+        "title": "Interaction Users Can Feel",
+        "subtitle": "A living WebGL scene of an entire city with its eighteen landmarks — a cinematic tour through its streets, manual camera control, and a day–night switch.",
+        "hint": "Drag to rotate · Click any landmark to explore it",
+        "fallback": "The 3D preview is not available on this device",
+        "city": {
+          "loader": "Preparing the scene",
+          "hint": "Click any landmark to explore · the fullscreen button unlocks full camera control",
+          "nodes": "18 NODES",
+          "manual": "Manual camera control mode",
+          "night": "Toggle day and night",
+          "tour": "Replay the cinematic tour",
+          "close": "Close",
+          "tipHint": "Click to view details",
+          "occDefault": "Occupancy rate",
+          "title": "Interactive city model · 18 landmarks",
+          "titleMono": "SCALE 1:1000 · GRID C-101 · REV 10",
+          "foot": "NODE {code} · SECTOR {sector} · SCALE 1:1000",
+          "hudCam": "CAM",
+          "hudCur": "CUR",
+          "fullscreen": "Fullscreen — full camera control",
+          "exitFullscreen": "Exit fullscreen",
+          "zoomIn": "Zoom in",
+          "zoomOut": "Zoom out",
+          "hintImmersive": "Drag to rotate · pinch or ± buttons to zoom · tap a landmark"
+        }
+      },
+      "journey": {
+        "kicker": "From Idea to Launch",
+        "title": "Your Journey With Us, in Detail",
+        "steps": {
+          "s1": {
+            "title": "Discovery Session",
+            "desc": "One hour focused on your goals and audience, defining what success looks like."
+          },
+          "s2": {
+            "title": "Identity & Prototype",
+            "desc": "A clear art direction and an interactive prototype before any final design."
+          },
+          "s3": {
+            "title": "Final Design",
+            "desc": "Complete screens with a full design system you approve in look and feel."
+          },
+          "s4": {
+            "title": "Development & Review",
+            "desc": "Weekly visible progress — you try it every Friday and steer instantly."
+          },
+          "s5": {
+            "title": "Testing & Launch",
+            "desc": "Performance, accessibility and device testing, then a safe, calm launch. Just before launch, two protected weeks of polish for the fine details — within the total duration, not on top of it."
+          },
+          "s6": {
+            "title": "Support & Growth",
+            "desc": "Continuous monitoring and periodic improvements — your site grows with your business."
+          }
+        }
+      },
+      "cta": {
+        "title": "Ready for a Website Worthy of Your Brand?",
+        "subtitle": "Start with the project calculator for an instant estimate — no commitment.",
+        "button": "Calculate Your Project Budget"
+      },
+      "explore": {
+        "label": "Our Other Services"
+      },
+      "prose": {
+        "kicker": "No Surprises",
+        "title": "What’s Included, and How We Work",
+        "included": {
+          "title": "What’s included in every project?",
+          "desc": "Every site we deliver — whatever its size — ships with the same foundation: 90+ Lighthouse performance, technical SEO, Arabic/English bilingual support, WCAG 2.1 AA accessibility, a dashboard your team can run without a developer, and analytics configured from day one. These are not paid add-ons; they are baselines we never compromise."
+        },
+        "process": {
+          "title": "How do we work with you?",
+          "desc": "We start with a discovery session about your audience and goals — before talking about looks — then an interactive prototype you try with your own hands before a single line is written. During the build you see progress weekly and steer it immediately: no launch-day surprises. After launch we stay close: performance monitoring, iterative improvements, and a site that grows with your business."
+        }
+      }
+    },
+    "automation": {
+      "hero": {
+        "kicker": "Services · Automation",
+        "title": "Systems That Work",
+        "titleAccent": "While You Sleep",
+        "subtitle": "We build n8n automation systems that connect your tools and handle the routine: invoices that issue themselves, alerts that arrive instantly, and customers who never wait for anyone.",
+        "cta": "Design Your System Now"
+      },
+      "integrations": {
+        "kicker": "Your Stack, Connected",
+        "title": "We Connect All Your Tools Together",
+        "note": "422+ ready apps via n8n — if your tool exists, we know it.",
+        "items": {
+          "crm": {
+            "title": "CRM Systems",
+            "desc": "Client and sales tracking without manual entry"
+          },
+          "invoicing": {
+            "title": "Invoicing & Accounting",
+            "desc": "Automatic invoices, notifications and reviews"
+          },
+          "email": {
+            "title": "Automated Email",
+            "desc": "Personal messages sent at the perfect moment"
+          },
+          "telegram": {
+            "title": "Instant Alerts",
+            "desc": "Telegram notifications for your team, moment by moment"
+          },
+          "sheets": {
+            "title": "Spreadsheets",
+            "desc": "Your data keeping itself in sync across systems"
+          },
+          "ai": {
+            "title": "Intelligent Agents",
+            "desc": "AI assistants that reply, classify and extract"
+          },
+          "payments": {
+            "title": "Payment Gateways",
+            "desc": "Automatic settlement, collection and tracking"
+          },
+          "databases": {
+            "title": "Databases",
+            "desc": "A unified, reliable data layer"
+          }
+        }
+      },
+      "runsOnN8n": {
+        "kicker": "A Fact, Not a Promise",
+        "title": "This Very Website Runs on n8n",
+        "desc": "Every request from the project calculator or contact form instantly travels through an HMAC-signed webhook to n8n: it’s registered in the agency’s CRM, you receive a welcome email, and our team gets a Telegram alert — all within seconds. The automation we sell is the same automation running this site.",
+        "flow": {
+          "request": "Request from Calculator",
+          "webhook": "HMAC-SHA256 Signed Webhook",
+          "actions": "CRM + Email + Telegram"
+        },
+        "badge": "Try the calculator and watch the flow"
+      },
+      "cta": {
+        "title": "Your Routine Deserves Better Automation",
+        "subtitle": "Calculate your automation system’s cost in under a minute.",
+        "button": "Design Your Automation System"
+      },
+      "explore": {
+        "label": "Our Other Services"
+      },
+      "prose": {
+        "kicker": "Full Transparency",
+        "title": "What’s Included, and How We Work",
+        "included": {
+          "title": "What’s included in every project?",
+          "desc": "Every automation system we build ships fully documented with clear flow diagrams, dry-run tests before delivery, monitoring logs that show everything as it happens, and restorable backups for every flow. An automation you do not understand is one you do not own — so we hand over full ownership with training for your team."
+        },
+        "process": {
+          "title": "How do we work with you?",
+          "desc": "We start with a full audit of your tools and daily routine: what repeats, what gets forgotten, what eats time. We sketch the proposed flows and review them with you before building, then implement in stages — each flow tested alone before linking to the next. At delivery the system is fully yours, with an optional monthly maintenance plan."
+        }
+      }
+    },
+    "work": {
+      "hero": {
+        "kicker": "Our Work",
+        "title": "Results That Speak",
+        "titleAccent": "in Numbers",
+        "subtitle": "Selected work — metrics are from specific real projects, not typical promises"
+      },
+      "filters": {
+        "all": "All",
+        "websites": "Websites",
+        "automation": "Automation"
+      },
+      "resultsCount": "{count, plural, one {# result} other {# results}}",
+      "projects": {
+        "p1": {
+          "title": "Lamsa Fashion Store",
+          "type": "E-commerce Store",
+          "desc": "From a sluggish off-the-shelf template to a boutique-grade shopping experience — even on mobile.",
+          "services": [
+            "Brand identity & shopping UX",
+            "Bilingual storefront",
+            "Local payment gateway",
+            "Inventory & shipping sync"
+          ],
+          "metrics": [
+            "+140% Conversion Rate",
+            "×2.3 Load Speed",
+            "−45% Cart Abandonment"
+          ],
+          "mock": {
+            "brand": "Lamsa",
+            "kicker": "Autumn 2025 Collection",
+            "title": "Quiet elegance, precise details",
+            "sub": "Natural fabrics and lasting tailoring — pieces made to stay.",
+            "cta": "Shop the Collection",
+            "cards": [
+              {
+                "name": "Wool Coat",
+                "price": "$349",
+                "old": "$429"
+              },
+              {
+                "name": "Leather Bag",
+                "price": "$289",
+                "old": "$359"
+              },
+              {
+                "name": "Cashmere Scarf",
+                "price": "$119",
+                "old": "$149"
+              }
+            ]
+          }
+        },
+        "p2": {
+          "title": "Aqar Plus Platform",
+          "type": "Real Estate Platform",
+          "desc": "A cluttered listings board became a smooth discovery platform with live maps and filters that understand buyers.",
+          "services": [
+            "Interactive map search",
+            "Agent accounts",
+            "Listings dashboard",
+            "Automated new-listing alerts"
+          ],
+          "metrics": [
+            "+85% Organic Visits",
+            "60% Longer Sessions"
+          ],
+          "mock": {
+            "brand": "Aqar Plus",
+            "kicker": "Latest listings",
+            "title": "Find a home worthy of your life",
+            "sub": "Smart filters and live maps — from first click to house keys.",
+            "cta": "Explore Properties",
+            "cards": [
+              {
+                "name": "Villa — Bloudan",
+                "price": "$540,000",
+                "old": ""
+              },
+              {
+                "name": "Apartment — Mezzeh",
+                "price": "$235,000",
+                "old": ""
+              },
+              {
+                "name": "Office — Business",
+                "price": "$120,000",
+                "old": "$135,000"
+              }
+            ]
+          }
+        },
+        "p3": {
+          "title": "Masar Academy",
+          "type": "Education Platform",
+          "desc": "From scattered PDFs to a full digital academy managing learning end to end — enrollment to certificates.",
+          "services": [
+            "Courses & subscriptions",
+            "Live lesson streaming",
+            "Automated quizzes & certificates",
+            "Student progress dashboard"
+          ],
+          "metrics": [
+            "4,200 Students in First Term",
+            "+68% Course Completion",
+            "−75% Manual Admin Work"
+          ],
+          "mock": {
+            "brand": "Masar",
+            "kicker": "Enrollment open",
+            "title": "Learn a skill that changes your path",
+            "sub": "Live courses and certified credentials with personal follow-up.",
+            "cta": "Start Learning",
+            "cards": [
+              {
+                "name": "UI/UX Foundations",
+                "price": "$129",
+                "old": "$159"
+              },
+              {
+                "name": "Content Marketing",
+                "price": "$99",
+                "old": ""
+              },
+              {
+                "name": "Project Management",
+                "price": "$149",
+                "old": "$189"
+              }
+            ]
+          }
+        },
+        "p4": {
+          "title": "Beit Al-Sham Restaurant",
+          "type": "Site + Bookings & Orders",
+          "desc": "A paper menu and phone-only bookings became a complete digital experience: instant reservations, orders straight to the kitchen.",
+          "services": [
+            "Interactive digital menu",
+            "Instant table booking",
+            "Pickup & delivery orders",
+            "Automated kitchen alerts"
+          ],
+          "metrics": [
+            "70% of Bookings Online",
+            "+35% Pickup Orders"
+          ],
+          "mock": {
+            "brand": "Beit Al-Sham",
+            "kicker": "From the heart of Damascus",
+            "title": "Home taste, home generosity",
+            "sub": "Order now — arrives hot within 30 minutes.",
+            "cta": "Book a Table",
+            "cards": [
+              {
+                "name": "Fattoush",
+                "price": "$12",
+                "old": "$15"
+              },
+              {
+                "name": "Shish Tawook",
+                "price": "$8",
+                "old": ""
+              },
+              {
+                "name": "Nabulsi Knafeh",
+                "price": "$6",
+                "old": ""
+              }
+            ]
+          }
+        },
+        "p5": {
+          "title": "Smart Invoicing System",
+          "type": "SaaS Billing System",
+          "desc": "Manual invoicing that ate a full day is now a self-running system: it issues, tracks, and reminds — with zero human touch.",
+          "services": [
+            "Automated invoice issuing",
+            "Escalating payment reminders",
+            "Accounting system sync",
+            "Monthly financial reports"
+          ],
+          "metrics": [
+            "−90% Issuance Time",
+            "Zero Overdue Invoices for 8 Months"
+          ],
+          "mock": {
+            "brand": "Smart Invoices"
+          }
+        },
+        "p6": {
+          "title": "Bassam Creative Studio",
+          "type": "Creative Agency Automation",
+          "desc": "A design agency drowning in messages and approvals got a digital production line — brief to delivery, fully managed.",
+          "services": [
+            "Client intake & qualification",
+            "Approval & draft workflows",
+            "Organized asset delivery",
+            "Project-based billing"
+          ],
+          "metrics": [
+            "×2 Projects Delivered Monthly",
+            "−14 Hours of Coordination Weekly"
+          ],
+          "mock": {
+            "brand": "Bassam"
+          }
+        }
+      },
+      "cta": {
+        "title": "Your Project Is Next",
+        "subtitle": "Tell us your idea — the first session is always free.",
+        "button": "Start the Conversation"
+      },
+      "gridTitle": "Work Gallery",
+      "requestCta": "Request a project like this"
+    },
+    "about": {
+      "hero": {
+        "kicker": "About Us",
+        "title": "The Story",
+        "titleAccent": "of Elyra",
+        "subtitle": "A small digital agency with an enormous obsession for detail."
+      },
+      "story": {
+        "kicker": "The Beginning",
+        "title": "Why We Exist",
+        "p1": "Elyra started with a question that bothered us for a long time:",
+        "quote": "Why do people have to choose between a beautiful site that runs slowly, and a fast site that looks dull? Between a powerful system that intimidates its users, and an easy tool that lets its owners down?",
+        "p2": "We decided not to choose. We design with beauty that stops the scrolling, engineer with precision that respects every millisecond, and automate whatever can be automated to give humans their time back — this is Elyra’s covenant with every client.",
+        "p3": "Today, after more than 120 projects spanning websites, platforms and automation systems, we’re still the same team: small, obsessed, and asking every single time — is this more beautiful than what came before?"
+      },
+      "values": {
+        "kicker": "Our Values",
+        "title": "Three Values We Never Compromise",
+        "beauty": {
+          "title": "Beauty First",
+          "desc": "Beauty isn’t decoration — it’s respect for a visitor giving you two seconds of their life. Every pixel needs a reason."
+        },
+        "precision": {
+          "title": "Precision as Engineering",
+          "desc": "Deadlines that are honored, code that is tested, performance that is measured. Precision isn’t a slogan; it’s a daily operating system."
+        },
+        "humanAutomation": {
+          "title": "Automation That Serves People",
+          "desc": "We automate routine to free time for creativity — not to replace humans, but to return them to what they do best."
+        }
+      },
+      "team": {
+        "kicker": "The Team",
+        "title": "The Minds Behind Elyra",
+        "members": {
+          "m1": {
+            "name": "Ahmad Al-Rifai",
+            "role": "Founder · Systems Engineer",
+            "bio": "Eight years building platforms before Elyra; believes the best code is the kind you never have to read twice."
+          },
+          "m2": {
+            "name": "Sara Qabbani",
+            "role": "Design Director",
+            "bio": "Designs interfaces as silent conversations with the user — every pixel a sentence, every whitespace a breath."
+          },
+          "m3": {
+            "name": "Mohammad Issa",
+            "role": "n8n Automation Engineer",
+            "bio": "Built 90+ automation flows for clients across six countries; insists routine is a human mistake, not fate."
+          },
+          "m4": {
+            "name": "Layla Haddad",
+            "role": "UX Strategist",
+            "bio": "Asks “why?” five times before any “how” — that is how experiences that stick get built."
+          }
+        }
+      },
+      "numbers": {
+        "kicker": "Agency Numbers",
+        "title": "Short, but It Speaks",
+        "years": {
+          "value": 5,
+          "suffix": "",
+          "label": "Years of Combined Experience"
+        },
+        "projects": {
+          "value": 120,
+          "suffix": "+",
+          "label": "Projects Delivered"
+        },
+        "automations": {
+          "value": 90,
+          "suffix": "+",
+          "label": "Automation Flows Built"
+        },
+        "clients": {
+          "value": 80,
+          "suffix": "+",
+          "label": "Happy Clients"
+        }
+      },
+      "exploreWork": {
+        "label": "See How We Work"
+      },
+      "cta": {
+        "title": "Like What You’re Reading?",
+        "subtitle": "Have a project that resembles you? Let’s build something worthy of you.",
+        "button": "Get in Touch"
+      }
+    },
+    "contact": {
+      "hero": {
+        "kicker": "Contact",
+        "title": "Let’s Start",
+        "titleAccent": "the Conversation",
+        "subtitle": "Tell us about your project — we usually reply within two hours on business days."
+      },
+      "channels": {
+        "kicker": "Direct Channels",
+        "title": "Talk to Us However You Prefer",
+        "email": {
+          "title": "Email"
+        },
+        "whatsapp": {
+          "title": "WhatsApp",
+          "greeting": "Hi Elyra! I’d like to talk about a project."
+        },
+        "telegram": {
+          "title": "Telegram"
+        },
+        "responseNote": "The fastest replies usually come via WhatsApp"
+      },
+      "form": {
+        "kicker": "The Classic Way",
+        "title": "Send a Message",
+        "name": "Name",
+        "email": "Email Address",
+        "message": "Your Message",
+        "messagePlaceholder": "Tell us about your project, goals, and any important deadlines…",
+        "send": "Send Message",
+        "sending": "Sending…",
+        "successTitle": "Your Message Arrived!",
+        "successDesc": "We’ll get back to you within one business day at most.",
+        "referenceLabel": "Your reference:",
+        "sendAnother": "Send Another Message",
+        "errors": {
+          "name": "Name is required (at least 2 characters)",
+          "email": "Please enter a valid email address",
+          "message": "Message is required (at least 10 characters)"
+        },
+        "errorTitle": "Couldn’t send your message",
+        "errorNetwork": "Check your connection and try again — your message is preserved.",
+        "projectTypeLabel": "Project Type",
+        "projectTypes": {
+          "store": "Smart Store",
+          "booking": "Booking Platform",
+          "agent": "AI Agent",
+          "dashboard": "Dashboard",
+          "websites": "Websites",
+          "automation": "Automation"
+        },
+        "whatsapp": "WhatsApp (optional)",
+        "whatsappPlaceholder": "+963 9XX XXX XXX",
+        "whatsappHint": "Optional — for faster replies",
+        "prefill": {
+          "serviceIdea": "I’d like to build: {service} — {idea}",
+          "ideaOnly": "I’d like to build: {idea}",
+          "serviceOnly": "I’d like to build: {service}."
+        }
+      },
+      "socialProof": {
+        "metrics": {
+          "lamsa": {
+            "company": "Lamsa Store",
+            "value": "+140%",
+            "label": "conversion rate"
+          },
+          "aqar": {
+            "company": "Aqar Plus",
+            "value": "+85%",
+            "label": "organic visits"
+          }
+        }
+      }
+    }
+  },
+  "common": {
+    "backToHome": "Back to Home",
+    "loading": "Loading...",
+    "errorTitle": "An Unexpected Error Occurred",
+    "errorDesc": "We apologize — something went wrong. Try again or come back later.",
+    "retry": "Try Again",
+    "notFoundTitle": "Signal Lost",
+    "notFoundDesc": "Looks like you’ve reached an old or incorrect link — no worries, the road home is short.",
+    "notFoundRecoveryTitle": "Where would you like to go?",
+    "cursor": {
+      "rotate": "Drag to rotate 360°",
+      "preview": "Live preview",
+      "drag": "Drag to compare",
+      "zoom": "Magnified preview",
+      "inspect": "Inspect element",
+      "external": "External link",
+      "magnet": ""
+    },
+    "close": "Close",
+    "notifications": "Notifications",
+    "sound": "Ambient sound"
+  },
+  "apiErrors": {
+    "invalid": "Please check the highlighted fields and try again.",
+    "fields": {
+      "name": "Name is required (2–100 characters).",
+      "email": "Please enter a valid email address.",
+      "whatsapp": "Invalid WhatsApp number: 5–30 characters, digits and phone symbols only (+, space, parenthesis, hyphen).",
+      "message": "Message is required (10 characters minimum).",
+      "service": "Invalid service value.",
+      "pages": "Pages must be between 1 and 20.",
+      "languages": "Invalid languages value.",
+      "threeD": "Invalid 3D option value.",
+      "integrations": "Invalid integrations list.",
+      "automationLevel": "Invalid automation level value.",
+      "source": "Invalid request source."
+    },
+    "unknownField": "Unknown field.",
+    "rateLimited": "Too many attempts — please wait a minute and try again.",
+    "tooLarge": "Request body too large.",
+    "crossOrigin": "Untrusted request. Please submit the form from the official website.",
+    "serverError": "An internal error occurred. Please try again shortly."
+  }
+}
