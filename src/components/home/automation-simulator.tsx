@@ -618,7 +618,7 @@ export function AutomationSimulator({
         <dl className="mt-6 grid grid-cols-3 gap-3 sm:gap-4">
           <div className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
             <dt className="text-[11px] text-white/60">{t('stats.steps')}</dt>
-            <dd className="mt-1 text-lg font-semibold tabular-nums text-white">{stepCount}</dd>
+            <dd className="mt-1 text-base font-semibold tabular-nums text-white sm:text-lg">{stepCount}</dd>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
             <dt className="text-[11px] text-white/60">{t('stats.total')}</dt>

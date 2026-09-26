@@ -59,7 +59,7 @@ export function PageHero({ namespace, ctaHref = '/contact', className, decorativ
            in-flow content) with zero z-index side effects on any
            descendant or sibling. */
         'relative isolate overflow-hidden bg-elyra-dark text-elyra-on-dark',
-        'pt-32 pb-20 sm:pt-40 sm:pb-28',
+        'pt-28 pb-16 sm:pt-40 sm:pb-28',
         className
       )}
       aria-labelledby="page-hero-title"

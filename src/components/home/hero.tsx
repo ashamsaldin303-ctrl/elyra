@@ -112,7 +112,7 @@ function HeroMarquee({ items }: { items: string[] }) {
   )
   return (
     <div
-      className="hero-marquee absolute inset-x-0 bottom-[150px] z-10"
+      className="hero-marquee absolute inset-x-0 bottom-[150px] z-10 max-sm:bottom-[110px]"
       dir="ltr"
       data-bg-layer=""
       aria-hidden="true"
@@ -532,14 +532,14 @@ export function Hero() {
         </VelocitySkew>
 
         <p
-          className="hero-enter mt-7 max-w-xl text-pretty text-base leading-relaxed text-white/70 sm:text-lg"
+          className="hero-enter mt-5 max-w-xl text-pretty text-base leading-relaxed text-white/70 sm:mt-7 sm:text-lg"
           style={{ animationDelay: '1.15s' }}
         >
           {t('subtitle')}
         </p>
 
         <div
-          className="hero-enter mt-9 flex w-full items-center gap-4 sm:gap-6"
+          className="hero-enter mt-6 flex w-full items-center gap-4 sm:mt-9 sm:gap-6"
           style={{ animationDelay: '1.35s' }}
         >
           <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
@@ -584,7 +584,10 @@ export function Hero() {
       {/* REF-2 Phase B — ClipCurve: the dark hero bleeds into the light
           trust bar along a scroll-deepening quadratic (the aardvark
           is--inner-clip signature). Decorative, click-through. */}
-      <ClipCurve fillClass="text-background" height={150} />
+      {/* GLOBAL-3: the curve band + marquee lift shrink on phones so the
+          fold keeps the CTAs (150px of curve on an 844px fold was dead
+          weight). The !important max-sm height beats the inline style. */}
+      <ClipCurve fillClass="text-background" height={150} className="max-sm:h-[110px]!" />
     </section>
   )
 }

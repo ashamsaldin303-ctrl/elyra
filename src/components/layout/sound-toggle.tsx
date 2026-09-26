@@ -62,7 +62,7 @@ export function SoundToggle({ className }: { className?: string }) {
       aria-label={label}
       title={`${label} — ${on ? 'ON' : 'OFF'} (S)`}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border border-white/15 px-2.5 py-1',
+        'inline-flex min-h-9 items-center gap-1.5 rounded-full border border-white/15 px-2.5 py-1',
         'font-mono text-[10px] uppercase tracking-[0.14em] text-white/60',
         'transition-colors duration-300 hover:border-white/35 hover:text-white',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-elyra-dark',

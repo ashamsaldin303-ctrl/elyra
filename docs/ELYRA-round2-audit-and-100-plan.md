@@ -49,3 +49,24 @@
 - **البوابات:** parity ‏761 GREEN · slop ‏0 · secrets ‏0 · صياغة TS أخضر (12 ملفاً) · tsc/lint في بيئة المالك (OOM الصندوق موثق في worklog).
 - **دين متبقٍ (WS12 + ما لم يُنفذ):** أيقونات الخدمات المرسومة يدوياً · إعادة تصميم OG card · caret/tail في طرفية المحاكي · code-split لـ before-after (استعيض عنه مؤقتاً بحارس fps للـ silk وبplates أخف) · دمشقنة المدينة ونحاس الـ runes (قرار مالك/ذاكرة).
 - **حالة المعاينة:** الخادم على :3000 من `elyra-preview` (stubs الـ3D الأربعة فقط)؛ الشجرة الحقيقية `elyra` كاملة الـ WebGL ومُcommitte؛ الدفع لـ GitHub يحتاج توكن جديداً (السابق أُتلف بعد الاستخدام — ويلغى من طرفكم).
+
+---
+
+## 4) ملحق الموبايل — تحليل ROUND-2/M (strict) وتطبيق GLOBAL-3
+
+> المنهج: فحص كود شامل لكل أنماط الجوال (tap targets · fixed widths · svh/dvh · safe-area · overflow · media queries) + لقطات موبايل الحالة GLOBAL-1 ‏(shots/final/ar-mob-*) + لقطات ديسكتوب ROUND-2. **إقرار صدق:** لقطات موبايل حية لحالة ROUND-2 تعذرت في الصندوق — خادم التطوير بعد الجولة الثانية يستهلك 687MB واقفاً (من 1GB)، فلا متصفح headless بجانبه؛ ومحاولات تجميد الصفحة ستاتيكياً فشلت لأن Turbopack يحقن CSS عبر JS chunks لا ملفات مربوطة. التحليل أدناه إذن: كود + لقطات سابقة + استنتاج موثق.
+
+| # | Finding (mobile) | الدليل | الإصلاح (GLOBAL-3) |
+|---|---|---|---|
+| M1 | sheet الجوال ما زال لوحة Radix جانبية بعناصر 48px وقائمة نصية عادية — لا يحمل الهوية | `navbar.tsx` SheetContent القديم | **Index overlay**: فهرس 01–06 mono + عناوين 800-weight بـ stagger ‏70ms على أعمق حبر + telemetry + safe-area |
+| M2 | طية الموبايل (844px): منحنى ClipCurve ‏150px + marquee مرفوع 150px يلتهمان ~20% من الطية والـ CTAs على الحافة | `hero.tsx` ClipCurve/marquee | `max-sm:h-[110px]!` + `max-sm:bottom-[110px]` + ضغط mt ‏(subtitle/CTAs) على الجوال فقط |
+| M3 | PageHero الداخلية pt-32/pb-20 على الجوال = فراغ علوي كبير قبل البيان | `page-hero.tsx` | `pt-28 pb-16` موبايل (وبقاء MOBILE-2 rune band سليماً) |
+| M4 | أزرار صغيرة عن 44px: نسخ المرجع min-h-8 · مفتاح الصوت ~26px | contact-form/sound-toggle | `min-h-11 sm:min-h-8` · `min-h-9` |
+| M5 | Case Sheet جانبي على الجوال = وصول إبهام ضعيف | work-grid Sheet | `useMobileTier` → side bottom ‏+ h-[92dvh] rounded-t-2xl |
+| M6 | شريط caption اللوحات قد يلتف قبيحاً عند 320–390 | work-grid plate bar | flex-wrap + gap-y-1 |
+| M7 | إحصاءات المحاكي 3 أعمدة نص lg على 390 = ضيق | simulator dl | `text-base sm:text-lg` |
+| M8 | سلامة: overflow-x clip موجود (html/body) · sim stage min-w-[680px] داخل overflow-x مع hint مرئي · city panel max-w-[85%] · لا fixed widths أخرى | grep census | لا تغيير مطلوب (موثق) |
+| M9 | safe-area: footer pb-env موجود · city controls موجودة · **overlay الجديد** pb-calc(env) | — | مضاف في M1 |
+| M10 | rail الإشارة على 390: 6 عقد بتباعد 68px وحزمة 10px — مقروءة ولا تلمس المحتوى | navbar SignalRail | لا تغيير (موثق) |
+
+** gates بعد GLOBAL-3:** parity ‏761 GREEN · slop ‏0 · secrets ‏0 · صياغة TS أخضر (7 ملفات). commit: `GLOBAL-3`.

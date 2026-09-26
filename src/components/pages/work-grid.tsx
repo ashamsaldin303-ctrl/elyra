@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet'
 import { getLenis } from '@/lib/lenis-holder'
 import { useIsRtl } from '@/lib/use-rtl'
+import { useMobileTier } from '@/lib/use-mobile-tier'
 import { cn } from '@/lib/utils'
 import { Reveal } from '@/components/shared/reveal'
 import { BeforeAfter, toMockContent, type ScenePalette } from '@/components/home/before-after'
@@ -120,6 +121,9 @@ export function WorkGrid() {
   const t = useTranslations('pages.work')
   const tc = useTranslations('common')
   const isRtl = useIsRtl()
+  /* GLOBAL-3 (WS4-mobile): on phones the case dossier is a BOTTOM SHEET —
+     the thumb-reach pattern; desktop keeps the side drawer. */
+  const mobileTier = useMobileTier()
   const [filter, setFilter] = useState<Filter>('all')
   /* GLOBAL-2 (WS4): the Case Sheet dossier state (Radix Sheet = focus trap
      + ESC + the Lenis single-writer contract, same as the navbar sheet). */
@@ -219,7 +223,7 @@ export function WorkGrid() {
                   {/* GLOBAL-2 (WS4): the comparison becomes a PLATE — mono
                       caption bar (folio · category · scene) + bezel ticks. */}
                   <div className="corner-ticks relative overflow-hidden rounded-2xl border border-border bg-card">
-                    <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2">
+                    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border px-4 py-2">
                       <span lang="en" dir="ltr" className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                         PLT-0{i + 1} · {p.category}
                       </span>
@@ -305,8 +309,11 @@ export function WorkGrid() {
           }}
         >
           <SheetContent
-            side={isRtl ? 'left' : 'right'}
-            className="flex h-dvh w-full max-w-3xl flex-col overflow-y-auto border-white/10 bg-elyra-deep p-0 text-elyra-on-dark"
+            side={mobileTier ? 'bottom' : isRtl ? 'left' : 'right'}
+            className={cn(
+              'flex w-full max-w-3xl flex-col overflow-y-auto border-white/10 bg-elyra-deep p-0 text-elyra-on-dark',
+              mobileTier ? 'h-[92dvh] rounded-t-2xl' : 'h-dvh'
+            )}
           >
             {openCase ? (
               <>

@@ -180,9 +180,14 @@ export function Navbar() {
             </SheetTrigger>
             <SheetContent
               side={isRtl ? 'left' : 'right'}
-              className="w-[88vw] max-w-sm border-white/10 bg-elyra-dark text-elyra-on-dark sm:w-[420px]"
+              /* GLOBAL-3 (WS3): the sheet became a FULL-SCREEN INDEX overlay —
+                 mono folios + display labels on the deepest ink, staggered
+                 idx-in rows, telemetry + sound-safe bottom zone with the
+                 home-indicator safe area. Radix focus trap + the Lenis
+                 single-writer contract (onOpenChange above) are untouched. */
+              className="inset-0 flex h-dvh w-screen max-w-none flex-col border-0 bg-elyra-deep p-0 text-elyra-on-dark"
             >
-              <SheetHeader className="flex flex-row items-center justify-between">
+              <SheetHeader className="flex flex-row items-center justify-between px-6 pt-6">
                 <SheetTitle>
                   <Logo variant="on-dark" />
                 </SheetTitle>
@@ -193,62 +198,64 @@ export function Navbar() {
                   <X className="size-5" aria-hidden="true" />
                 </SheetClose>
               </SheetHeader>
-              <div className="mt-6 flex h-full flex-col">
-                <ul className="flex flex-col gap-1">
-                  {items.map((item) => {
+              <nav className="mt-2 flex-1 overflow-y-auto" aria-label={t('nav.ariaLabel')}>
+                <ul>
+                  {[{ href: '/' as const, label: t('nav.home') }, ...items].map((item, i) => {
                     const active = pathname === item.href
                     return (
-                      <li key={item.href}>
+                      <li
+                        key={item.href}
+                        className="idx-in border-b border-white/5"
+                        style={{ animationDelay: `${i * 70}ms` }}
+                      >
                         <SheetClose asChild>
                           <Link
                             href={item.href}
                             data-cursor="magnet"
                             className={cn(
-                              'group relative flex min-h-12 items-center overflow-hidden rounded-xl px-4 py-3 text-base transition-colors',
-                              active
-                                /* MED-2: token-driven active pill. The g-* names
-                                   are palette-neutral aliases — --g-blue now
-                                   resolves to Google blue (#4285F4) after the
-                                   blue palette revert, so the pill and
-                                   its ring auto-followed the rebrand with no
-                                   change here. Text stays full white: the tinted
-                                   pill over #0F172A is a low-contrast surface,
-                                   so white (~14.7:1) keeps AA and mirrors the
-                                   desktop active treatment (white text +
-                                   colored indicator). */
-                                ? 'bg-g-blue/15 text-white ring-1 ring-g-blue/40'
-                                : 'text-white/80 hover:bg-white/5 hover:text-white'
+                              'flex min-h-16 items-baseline gap-5 px-6 py-4 transition-colors duration-300',
+                              active ? 'text-signal' : 'text-white hover:text-signal'
                             )}
                             aria-current={active ? 'page' : undefined}
                           >
-                            {item.label}
-                            {/* Phase 5 P1-1: prominent active indicator — thick
-                                primary bar on the start side (RTL-correct via
-                                inset-inline-start) with a soft glow. Was h-0.5
-                                (2px) at bottom which VLM could not see. */}
-                            {active ? (
-                              <span
-                                className="pointer-events-none absolute inset-y-2 start-0 w-1 rounded-full bg-g-blue shadow-[0_0_12px_var(--color-g-blue)]"
-                                aria-hidden="true"
-                              />
-                            ) : null}
+                            <span
+                              lang="en"
+                              dir="ltr"
+                              className="font-mono text-[11px] tracking-[0.22em] text-elyra-gold/70"
+                            >
+                              0{i + 1}
+                            </span>
+                            <span
+                              className="text-3xl font-extrabold tracking-tight sm:text-4xl"
+                              style={{ fontVariationSettings: '"wght" 800' }}
+                            >
+                              {item.label}
+                            </span>
                           </Link>
                         </SheetClose>
                       </li>
                     )
                   })}
                 </ul>
-                <div className="mt-auto flex flex-col gap-3 pt-6">
-                  <LanguageSwitcher variant="on-dark" />
-                  <SheetClose asChild>
-                    <Link
-                      href="/contact"
-                      className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-4 text-base font-medium text-primary-foreground"
-                    >
-                      {t('nav.cta')}
-                    </Link>
-                  </SheetClose>
+              </nav>
+              <div className="flex flex-col gap-4 border-t border-white/10 px-6 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+                <div
+                  dir="ltr"
+                  lang="en"
+                  className="elyra-mono flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.18em] text-white/45"
+                >
+                  <DamascusClock locale={locale} className="text-[10px]" />
+                  <span>{DAMASCUS_COORDS}</span>
                 </div>
+                <LanguageSwitcher variant="on-dark" />
+                <SheetClose asChild>
+                  <Link
+                    href="/contact"
+                    className="btn-energy inline-flex h-12 items-center justify-center rounded-full bg-primary px-4 text-base font-medium text-primary-foreground"
+                  >
+                    {t('nav.cta')}
+                  </Link>
+                </SheetClose>
               </div>
             </SheetContent>
           </Sheet>

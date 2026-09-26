@@ -613,7 +613,7 @@ function SuccessBox({
                       /* clipboard denied — the reference stays readable */
                     }
                   }}
-                  className="btn-line ms-2 inline-flex min-h-8 items-center rounded-full border border-border px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:border-signal/40 hover:text-signal"
+                  className="btn-line ms-2 inline-flex min-h-11 items-center rounded-full border border-border px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:border-signal/40 hover:text-signal sm:min-h-8"
                 >
                   {tCopy('copy')}
                 </button>
