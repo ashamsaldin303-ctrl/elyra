@@ -1,10 +1,11 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { HeroAtmosphere } from './hero-atmosphere'
+import { DamascusClock } from '@/components/layout/damascus-clock'
 
 interface PageHeroProps {
   namespace: string
@@ -37,6 +38,7 @@ interface PageHeroProps {
  */
 export function PageHero({ namespace, ctaHref = '/contact', className, decorative, atmosphere }: PageHeroProps) {
   const t = useTranslations(namespace)
+  const locale = useLocale()
 
   return (
     <section
@@ -73,23 +75,39 @@ export function PageHero({ namespace, ctaHref = '/contact', className, decorativ
         />
       )}
       {decorative}
-      <div className="elyra-container max-w-4xl text-center">
-        <span className="kicker kicker-on-dark hero-enter hero-enter-1">
-          {t('kicker')}
-        </span>
+      {/* GLOBAL-2 (ROUND-2 WS1): the centered landing hero is RETIRED —
+          inner pages now open as INSTRUMENT TITLE BLOCKS: a start-aligned
+          display statement at poster weight, a mono readout row, and a
+          telemetry rail on the end margin (studio time + spec). The
+          LCP-safe CSS-only entrance contract (hero-enter, no framer,
+          server-rendered) is untouched — D14 stays authoritative. */}
+      <div className="elyra-container max-w-container relative">
+        <div className="hero-enter hero-enter-1 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <span className="kicker kicker-on-dark">{t('kicker')}</span>
+          {atmosphere ? (
+            <span
+              lang="en"
+              dir="ltr"
+              aria-hidden="true"
+              className="font-mono text-[10px] uppercase tracking-[0.22em] text-elyra-gold/80"
+            >
+              {atmosphere.fig}
+            </span>
+          ) : null}
+        </div>
         <h1
           id="page-hero-title"
-          className="hero-enter mt-6 text-balance text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
-          // wght 700 baseline — matches the home hero's KineticHeading
-          // (idle) default; 200 read as a different (thin) brand voice.
-          style={{ fontVariationSettings: '"wght" 700' }}
+          className="hero-enter mt-6 max-w-5xl text-balance text-start text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl lg:text-[5.5rem]"
+          // wght 800 — the GLOBAL-2 poster voice (the home hero keeps its
+          // own variable-wght cursor binding; two registers, one family).
+          style={{ fontVariationSettings: '"wght" 800' }}
         >
           <span className="block">{t('title')}</span>
           {t.has('titleAccent') ? (
             <span className="block text-signal">{t('titleAccent')}</span>
           ) : null}
         </h1>
-        <p className="hero-enter mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/70 sm:text-lg md:text-xl">
+        <p className="hero-enter mt-6 max-w-2xl text-pretty text-start text-base leading-relaxed text-white/70 sm:text-lg md:text-xl">
           {t('subtitle')}
         </p>
         {ctaHref && t.has('cta') ? (
@@ -104,6 +122,19 @@ export function PageHero({ namespace, ctaHref = '/contact', className, decorativ
             </Link>
           </div>
         ) : null}
+        {/* Telemetry rail — the page's instrument margin (desktop). */}
+        <div
+          aria-hidden="true"
+          lang="en"
+          dir="ltr"
+          className="pointer-events-none absolute end-0 top-2 hidden flex-col items-end gap-4 xl:flex"
+        >
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/40">
+            {atmosphere?.spec ?? 'GRID 12 × 8 · SPEC v2.5'}
+          </span>
+          <span className="h-20 w-px bg-gradient-to-b from-transparent via-white/30 to-transparent" />
+          <DamascusClock locale={locale} className="text-[10px] text-white/40" />
+        </div>
       </div>
     </section>
   )

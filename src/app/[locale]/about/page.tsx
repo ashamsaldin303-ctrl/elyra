@@ -3,7 +3,7 @@ import { hasLocale } from 'next-intl'
 import { notFound } from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
-import { Sparkles, Target, Bot, CalendarRange, Briefcase, Workflow, Users, ArrowRight } from 'lucide-react'
+import { Sparkles, Target, Bot, ArrowRight } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { PageHero } from '@/components/shared/page-hero'
 import { CTA } from '@/components/shared/cta'
@@ -24,21 +24,24 @@ const TEAM = ['m1', 'm2', 'm3', 'm4'] as const
 // projects, automations executed, happy clients.
 const NUMBERS = ['years', 'projects', 'automations', 'clients'] as const
 
-/* UI-5: per-number visual identity — mirrors the home TrustBar treatment
-   (decorative aria-hidden icon chips + gradient accent under the value). */
-const NUMBER_ICONS = {
-  years: CalendarRange,
-  projects: Briefcase,
-  automations: Workflow,
-  clients: Users,
-} as const
-
+/* GLOBAL-2 (ROUND-2 WS7): the numbers are READOUTS — icon chips removed
+   (data carries its own authority; micro-sparklines supply the instrument
+   pulse). Avatar fields left the warm Google-quad gradients (audit R4
+   residue, screenshot-verified) for steel/blue ink washes. */
 const AVATAR_GRADIENTS = [
+  'from-[#0A2A5E] to-primary',
   'from-primary to-g-blue',
-  'from-g-red to-g-yellow',
-  'from-g-green to-primary',
-  'from-g-yellow to-g-red',
+  'from-[#16202E] to-[#3D4B5C]',
+  'from-[#0E3A6E] to-signal-deep',
 ]
+
+/** Decorative 5-bar sparkline (the readout's pulse). Heights per index. */
+const SPARKS = [
+  [35, 55, 40, 70, 100],
+  [20, 45, 60, 50, 85],
+  [40, 60, 75, 65, 95],
+  [30, 50, 45, 80, 100],
+] as const
 
 export async function generateMetadata({
   params,
@@ -224,8 +227,7 @@ export default async function AboutPage({
             titleId="numbers-title"
           />
           <dl className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border lg:grid-cols-4">
-            {NUMBERS.map((n) => {
-              const NumberIcon = NUMBER_ICONS[n]
+            {NUMBERS.map((n, i) => {
               return (
                 /* div wrapper inside dl is valid only when it contains
                    exclusively dt/dd — the visible label lives inside the dd. */
@@ -233,10 +235,16 @@ export default async function AboutPage({
                   <dt className="sr-only">{t(`numbers.${n}.label`)}</dt>
                   <dd className="transition-transform duration-300 hover:-translate-y-1">
                     <span
-                      className="mx-auto flex size-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-signal"
                       aria-hidden="true"
+                      className="mx-auto flex h-4 items-end justify-center gap-0.5"
                     >
-                      <NumberIcon className="size-5" aria-hidden="true" />
+                      {(SPARKS[i % SPARKS.length] ?? SPARKS[0]).map((h, si) => (
+                        <span
+                          key={si}
+                          className={`w-0.5 rounded-sm ${si === 4 ? 'bg-signal' : 'bg-signal/30'}`}
+                          style={{ height: `${h}%` }}
+                        />
+                      ))}
                     </span>
                     <span className="mt-4 block text-4xl font-bold tracking-tight text-signal sm:text-5xl">
                       {Number(t.raw(`numbers.${n}.value`))}

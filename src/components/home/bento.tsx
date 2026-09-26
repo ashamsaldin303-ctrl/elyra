@@ -1083,6 +1083,17 @@ function MiniCount() {
         aria-hidden="true"
         className="relative mt-3 flex h-44 items-center justify-center overflow-hidden rounded-xl border border-border bg-elyra-dark/95"
       >
+        {/* GLOBAL-2 (WS7): instrument tick ring around the gauge. */}
+        <span
+          className="pointer-events-none absolute inset-5 rounded-full"
+          style={{
+            background:
+              'repeating-conic-gradient(rgba(127,178,255,0.28) 0deg 1.5deg, transparent 1.5deg 30deg)',
+            WebkitMask:
+              'radial-gradient(circle, transparent 60%, black 62%, black 78%, transparent 80%)',
+            mask: 'radial-gradient(circle, transparent 60%, black 62%, black 78%, transparent 80%)',
+          }}
+        />
         <RingGauge
           fraction={1}
           value={422}

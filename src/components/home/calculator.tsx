@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { z } from 'zod'
@@ -340,7 +340,12 @@ export function Calculator() {
         />
 
         {/* Progress */}
-        <div className="mt-10 flex items-center justify-between gap-4">
+        {/* GLOBAL-2 (WS5): the progress bar became a MEASUREMENT RAIL —
+            mono folios 01/02/03 on a tick line with a signal fill; a CSS
+            transform transition replaces the framer scaleX bar (same
+            compositor-only contract, one less animator). The localized
+            polite counter above stays the SR source of truth. */}
+        <div className="mt-10 flex items-center gap-4">
           {/* AUDIT-C4 MEDIUM (fix 2b): polite live region — the counter
               sits OUTSIDE the AnimatePresence swap, so it updates (and
               is announced) the instant a step button fires, covering the
@@ -348,35 +353,34 @@ export function Calculator() {
           <p className="text-sm text-muted-foreground" aria-live="polite">
             {t('step', { current: formatTNumber(step + 1, locale), total: formatTNumber(3, locale) })}
           </p>
-          <div className="flex flex-1 gap-2">
+          <div className="flex flex-1 items-center" dir="ltr">
             {[0, 1, 2].map((s) => (
-              <div
-                key={s}
-                className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted"
-                aria-hidden="true"
-              >
-                <motion.div
-                  className="h-full w-full origin-left rounded-full bg-primary rtl:origin-right"
-                  initial={false}
-                  animate={{ scaleX: step >= s ? 1 : 0 }}
-                  // G2-4 F4: scaleX + transform-origin instead of animating
-                  // `width` — the codebase's compositor-only convention
-                  // (L6-F1 hb-scan, G3F-A packet/flow-dot/pulse). The fill
-                  // grows from the reading-start edge: origin-left in LTR,
-                  // origin-right in RTL (rtl: variant). initial={false}
-                  // keeps the no-mount-animation contract.
-                  // L4 R3 P3: framer-motion animates on its own JS clock —
-                  // the global CSS reduced-motion kill-switch can't reach
-                  // it. Gate the tween duration like the file's own
-                  // slideVariants discipline.
-                  transition={reduced ? { duration: 0 } : { duration: 0.4 }}
-                />
-              </div>
+              <Fragment key={s}>
+                <span
+                  className={cn(
+                    'font-mono text-[11px] tracking-[0.18em] transition-colors duration-300',
+                    step >= s ? 'text-signal' : 'text-muted-foreground'
+                  )}
+                >
+                  0{s + 1}
+                </span>
+                {s < 2 ? (
+                  <span className="relative mx-2 h-px flex-1 overflow-hidden bg-border" aria-hidden="true">
+                    <span
+                      className="absolute inset-0 origin-left bg-signal transition-transform duration-500"
+                      style={{
+                        transform: `scaleX(${step > s ? 1 : 0})`,
+                        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                    />
+                  </span>
+                ) : null}
+              </Fragment>
             ))}
           </div>
         </div>
 
-        <div className="relative mt-8 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-10">
+        <div className="corner-ticks relative mt-8 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-10">
           {/* UI-5 (visual-only): gradient hairline accent along the wizard
               card's top edge — decorative, no logic/state/pricing impact. */}
           <span
@@ -774,6 +778,23 @@ export function Calculator() {
                               </li>
                             ))}
                           </ul>
+                        </div>
+                        {/* GLOBAL-2 (WS5): the estimate lands as a stamped
+                            certificate readout — brass rules + a one-shot
+                            backOut stamp (the sanctioned stampConfirm
+                            exception; reduced-motion renders it static). */}
+                        <div className="mt-6 flex items-center justify-between gap-3 border-y border-elyra-gold/25 py-2">
+                          <span lang="en" dir="ltr" className="font-mono text-[10px] uppercase tracking-[0.22em] text-elyra-gold/80">
+                            Estimate · certified read
+                          </span>
+                          <motion.span
+                            className="rotate-[-4deg] rounded border border-signal/50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.22em] text-signal"
+                            initial={reduced ? false : { opacity: 0, scale: 1.3 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={reduced ? { duration: 0 } : { duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+                          >
+                            OK
+                          </motion.span>
                         </div>
                         <p className="mt-4 flex items-start gap-1.5 text-xs text-muted-foreground">
                           <AlertCircle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />

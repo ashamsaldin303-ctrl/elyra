@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useEffect, useRef, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { Link, usePathname } from '@/i18n/navigation'
 import { Logo } from '@/components/brand/logo'
 import { LanguageSwitcher, LanguageToggleCompact } from './language-switcher'
@@ -10,6 +10,8 @@ import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useIsRtl } from '@/lib/use-rtl'
 import { getLenis } from '@/lib/lenis-holder'
+import { DamascusClock } from './damascus-clock'
+import { DAMASCUS_COORDS } from '@/lib/site-config'
 
 function navItems(t: ReturnType<typeof useTranslations>) {
   return [
@@ -25,6 +27,7 @@ export function Navbar() {
   const t = useTranslations()
   const pathname = usePathname()
   const isRtl = useIsRtl()
+  const locale = useLocale()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
 
@@ -65,7 +68,12 @@ export function Navbar() {
            1280px cap + 16px mobile gutters; the scrolled glass surface now
            spans the same content measure as every section below it. */
         className={cn(
-          'elyra-container max-w-container flex h-16 items-center justify-between',
+          /* GLOBAL-2 (WS2): the cockpit condenses on scroll (h-16 → h-13)
+             and reveals the telemetry cluster — height/color transitions
+             only, zero CLS (fixed header; page padding unchanged). */
+          'elyra-container max-w-container flex items-center justify-between',
+          scrolled ? 'h-13' : 'h-16',
+          'transition-[height,background-color,border-color] duration-300',
           surface
         )}
         aria-label={t('nav.ariaLabel')}
@@ -91,26 +99,17 @@ export function Navbar() {
                 <Link
                   href={item.href}
                   className={cn(
-                    'group relative inline-flex h-11 items-center rounded-full px-3 text-sm font-medium transition-colors',
+                    /* GLOBAL-2 (WS2): the active state is a filled cockpit
+                       pill (the sliding indicator stays framer-free — the
+                       navbar remains a zero-framer initial chunk, F-S3-04). */
+                    'group relative inline-flex h-11 items-center rounded-full px-3 text-sm font-medium transition-colors duration-300',
                     active
-                      ? 'text-white'
-                      : 'text-white/70 hover:text-white'
+                      ? 'bg-white/10 text-white'
+                      : 'text-white/70 hover:bg-white/5 hover:text-white'
                   )}
                   aria-current={active ? 'page' : undefined}
                 >
                   {item.label}
-                  {/* Phase 5 P1-1: prominent active indicator — primary underline
-                      that scales in on hover/active. Was previously just a 20%
-                      text-opacity shift that VLM could not distinguish. */}
-                  <span
-                    className={cn(
-                      'pointer-events-none absolute inset-x-2 -bottom-0.5 h-0.5 rounded-full bg-primary transition-[opacity,transform] duration-300',
-                      active
-                        ? 'opacity-100 scale-x-100'
-                        : 'opacity-0 scale-x-0 group-hover:opacity-50 group-hover:scale-x-75'
-                    )}
-                    aria-hidden="true"
-                  />
                 </Link>
               </li>
             )
@@ -118,6 +117,20 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
+          {/* GLOBAL-2 (WS2): cockpit telemetry — fades in with the scrolled
+              surface; tabular mono clock = fixed width = zero CLS. */}
+          <span
+            dir="ltr"
+            lang="en"
+            className={cn(
+              'elyra-mono hidden items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-white/50 transition-opacity duration-300 lg:flex',
+              scrolled ? 'opacity-100' : 'pointer-events-none opacity-0'
+            )}
+          >
+            <DamascusClock locale={locale} className="text-[10px]" />
+            <span className="h-3 w-px bg-white/20" aria-hidden="true" />
+            <span>{DAMASCUS_COORDS}</span>
+          </span>
           <LanguageSwitcher variant="on-dark" className="hidden sm:inline-flex" />
           {/* Batch 2 item 11b: compact EN/ع toggle on the mobile bar — the
               full switcher only appears at sm+, and before this the
@@ -241,6 +254,75 @@ export function Navbar() {
           </Sheet>
         </div>
       </nav>
+      {/* GLOBAL-2 (WS2): the Signal Rail — the navigation signature. */}
+      <SignalRail items={items} pathname={pathname} rtl={isRtl} />
     </header>
+  )
+}
+
+/**
+ * GLOBAL-2 (WS2) — SignalRail: one node per route under the navbar; a light
+ * PACKET glides to the clicked node on every route change («the system
+ * routes you» — the automation agency's own navigation metaphor). Pure
+ * compositor: the packet rides a full-width wrapper translated in % (the
+ * elyra-packet idiom from the simulator), nodes are static dots, and the
+ * only state flip is the destination index on pathname change.
+ * RTL: node positions mirror physically (home at the right edge).
+ */
+function SignalRail({
+  items,
+  pathname,
+  rtl,
+}: {
+  items: { href: string }[]
+  pathname: string
+  rtl: boolean
+}) {
+  const nodes = ['/', ...items.map((i) => i.href)]
+  const n = nodes.length
+  const idx = Math.max(0, nodes.indexOf(pathname))
+  const [pos, setPos] = useState(idx)
+  const prevRef = useRef(idx)
+
+  useEffect(() => {
+    const next = Math.max(0, nodes.indexOf(pathname))
+    if (next === prevRef.current) return
+    prevRef.current = next
+    // one rAF so the transition always has a from-state to glide from
+    const id = window.requestAnimationFrame(() => setPos(next))
+    return () => window.cancelAnimationFrame(id)
+  }, [pathname, nodes])
+
+  const pct = (i: number) => {
+    const p = (i / (n - 1)) * 100
+    return rtl ? 100 - p : p
+  }
+
+  return (
+    <div className="elyra-container max-w-container" aria-hidden="true">
+      <div className="relative h-2">
+        <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/10" />
+        {nodes.map((href, i) => (
+          <span
+            key={href}
+            className={cn(
+              'absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full transition-colors duration-300',
+              i === idx ? 'bg-signal' : 'bg-white/25'
+            )}
+            style={{ left: `${pct(i)}%` }}
+          />
+        ))}
+        {/* the packet — wrapper translateX in % of the rail width */}
+        <span
+          className="absolute inset-0 transition-transform duration-500"
+          style={{
+            transform: `translateX(${rtl ? -pos * (100 / (n - 1)) : pos * (100 / (n - 1))}%)`,
+            transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+        >
+          <span className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signal shadow-[0_0_10px_rgba(127,178,255,0.9)]" />
+        </span>
+      </div>
+    </div>
   )
 }

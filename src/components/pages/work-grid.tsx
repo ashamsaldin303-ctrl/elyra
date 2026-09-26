@@ -2,8 +2,11 @@
 
 import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Wrench, ArrowRight } from 'lucide-react'
+import { Wrench, ArrowRight, X } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet'
+import { getLenis } from '@/lib/lenis-holder'
+import { useIsRtl } from '@/lib/use-rtl'
 import { cn } from '@/lib/utils'
 import { Reveal } from '@/components/shared/reveal'
 import { BeforeAfter, toMockContent, type ScenePalette } from '@/components/home/before-after'
@@ -115,7 +118,12 @@ type Filter = 'all' | Category
 
 export function WorkGrid() {
   const t = useTranslations('pages.work')
+  const tc = useTranslations('common')
+  const isRtl = useIsRtl()
   const [filter, setFilter] = useState<Filter>('all')
+  /* GLOBAL-2 (WS4): the Case Sheet dossier state (Radix Sheet = focus trap
+     + ESC + the Lenis single-writer contract, same as the navbar sheet). */
+  const [openCase, setOpenCase] = useState<ProjectDef | null>(null)
 
   const visible = useMemo(
     () => (filter === 'all' ? PROJECTS : PROJECTS.filter((p) => p.category === filter)),
@@ -208,7 +216,17 @@ export function WorkGrid() {
                       removed: pointer users were invited to click and
                       nothing happened. The comparison mockup keeps its
                       static frame. */}
-                  <div className="rounded-2xl">
+                  {/* GLOBAL-2 (WS4): the comparison becomes a PLATE — mono
+                      caption bar (folio · category · scene) + bezel ticks. */}
+                  <div className="corner-ticks relative overflow-hidden rounded-2xl border border-border bg-card">
+                    <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2">
+                      <span lang="en" dir="ltr" className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                        PLT-0{i + 1} · {p.category}
+                      </span>
+                      <span lang="en" dir="ltr" className="font-mono text-[10px] uppercase tracking-[0.18em] text-elyra-gold/70">
+                        {p.variant}
+                      </span>
+                    </div>
                     <BeforeAfter
                       variant={p.variant}
                       accent={p.accent}
@@ -261,11 +279,96 @@ export function WorkGrid() {
                       aria-hidden="true"
                     />
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => setOpenCase(p)}
+                    data-cursor="magnet"
+                    className="btn-line mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-5 text-sm font-medium text-foreground transition-colors duration-300 hover:border-signal/40 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    {t('openCase')}
+                  </button>
                 </Reveal>
               </article>
             )
           })}
         </div>
+
+        {/* GLOBAL-2 (WS4): Case Sheet — the missing depth layer (audit R3/F7):
+            each plate opens a full case dossier (interactive comparison,
+            results readout, services, prefill CTA) in a Radix Sheet. */}
+        <Sheet
+          open={openCase !== null}
+          onOpenChange={(next) => {
+            if (next) getLenis()?.stop()
+            else getLenis()?.start()
+            if (!next) setOpenCase(null)
+          }}
+        >
+          <SheetContent
+            side={isRtl ? 'left' : 'right'}
+            className="flex h-dvh w-full max-w-3xl flex-col overflow-y-auto border-white/10 bg-elyra-deep p-0 text-elyra-on-dark"
+          >
+            {openCase ? (
+              <>
+                <SheetHeader className="flex flex-row items-start justify-between gap-4 px-6 pt-6">
+                  <SheetTitle className="text-2xl font-extrabold tracking-tight">
+                    {t(`projects.${openCase.key}.title`)}
+                  </SheetTitle>
+                  <SheetClose
+                    className="inline-flex size-11 shrink-0 items-center justify-center rounded-full text-white hover:bg-white/10"
+                    aria-label={tc('close')}
+                  >
+                    <X className="size-5" aria-hidden="true" />
+                  </SheetClose>
+                </SheetHeader>
+                <div className="px-6 pb-10 pt-4">
+                  <p lang="en" dir="ltr" className="font-mono text-[10px] uppercase tracking-[0.18em] text-elyra-gold/70">
+                    PLT-0{PROJECTS.findIndex((x) => x.key === openCase.key) + 1} · {openCase.variant}
+                  </p>
+                  <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
+                    <BeforeAfter
+                      variant={openCase.variant}
+                      accent={openCase.accent}
+                      palette={openCase.palette}
+                      tone={openCase.tone}
+                      label={t(`projects.${openCase.key}.title`)}
+                      mock={toMockContent(t.raw(`projects.${openCase.key}.mock`))}
+                    />
+                  </div>
+                  <p className="mt-5 text-sm leading-relaxed text-white/70">
+                    {t(`projects.${openCase.key}.desc`)}
+                  </p>
+                  <p lang="en" dir="ltr" className="mt-7 font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">
+                    Results
+                  </p>
+                  <ul className="mt-2 space-y-1.5">
+                    {asStringArray(t.raw(`projects.${openCase.key}.metrics`)).map((m) => (
+                      <li key={m} className="border-b border-white/5 pb-1.5 text-sm font-medium text-signal">
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                  <p lang="en" dir="ltr" className="mt-7 font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">
+                    Services
+                  </p>
+                  <ul className="mt-2 flex flex-wrap gap-2">
+                    {asStringArray(t.raw(`projects.${openCase.key}.services`)).map((s) => (
+                      <li key={s} className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/75">
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={`/contact?service=${openCase.category === 'automation' ? 'automation' : 'websites'}&idea=${encodeURIComponent(t(`projects.${openCase.key}.title`))}`}
+                    className="btn-energy mt-9 inline-flex h-12 items-center gap-2 rounded-full bg-primary px-6 text-base font-medium text-primary-foreground"
+                  >
+                    {t('requestCta')}
+                  </Link>
+                </div>
+              </>
+            ) : null}
+          </SheetContent>
+        </Sheet>
       </div>
     </section>
   )

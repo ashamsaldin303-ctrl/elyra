@@ -7,6 +7,14 @@ import { SectionHeading } from '@/components/shared/section-heading'
 import { usePrefersReducedMotion } from '@/lib/use-reduced-motion'
 import { cn } from '@/lib/utils'
 
+/** Decorative sparkline heights per stat index (GLOBAL-2 WS10/R10). */
+const TRUST_SPARKS = [
+  [30, 50, 45, 75, 100],
+  [25, 40, 65, 55, 90],
+  [45, 60, 50, 80, 95],
+  [20, 35, 60, 70, 100],
+] as const
+
 interface CounterProps {
   value: number
   suffix: string
@@ -169,6 +177,21 @@ export function TrustBar() {
                     >
                       <Counter value={Number(item.value)} suffix={item.suffix} />
                     </span>
+                  </span>
+                  {/* GLOBAL-2 (WS10/R10): the readout's pulse — a 5-bar
+                      micro-sparkline (decorative; the numeral itself stays
+                      perfectly still per «never animate information»). */}
+                  <span
+                    aria-hidden="true"
+                    className="mx-auto mt-4 flex h-4 items-end justify-center gap-0.5"
+                  >
+                    {TRUST_SPARKS[i % TRUST_SPARKS.length].map((h, si) => (
+                      <span
+                        key={si}
+                        className={`w-0.5 rounded-sm ${si === 4 ? 'bg-signal' : 'bg-signal/30'}`}
+                        style={{ height: `${h}%` }}
+                      />
+                    ))}
                   </span>
                   <span className="mt-3 block text-sm font-normal tracking-normal text-muted-foreground">{item.label}</span>
                 </dd>

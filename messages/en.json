@@ -1436,7 +1436,8 @@
         "button": "Start the Conversation"
       },
       "gridTitle": "Work Gallery",
-      "requestCta": "Request a project like this"
+      "requestCta": "Request a project like this",
+      "openCase": "Open the case sheet"
     },
     "about": {
       "hero": {
@@ -1624,7 +1625,9 @@
     },
     "close": "Close",
     "notifications": "Notifications",
-    "sound": "Ambient sound"
+    "sound": "Ambient sound",
+    "copy": "Copy",
+    "copied": "Reference copied"
   },
   "apiErrors": {
     "invalid": "Please check the highlighted fields and try again.",

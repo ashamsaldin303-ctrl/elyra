@@ -652,7 +652,10 @@ html[data-page-wait] .hero-atmosphere * {
      the lazy IO gates never flipped → methodology/calculator/simulator
      never mounted. Backwards fill keeps the first keyframe armed during
      any future animation-delay while leaving the end state clean. */
-  animation: page-enter 0.85s cubic-bezier(0.77, 0, 0.175, 1) backwards;
+  /* GLOBAL-2 (WS9): the T3-11 deviation folds into the motion canon (D2 —
+     ONE site curve): same organic reveal, canon expo ease, tighter start
+     radius, 0.7s budget. */
+  animation: page-enter 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 [dir='rtl'] .page-enter {
   --pe-ox: 93%;
@@ -660,7 +663,7 @@ html[data-page-wait] .hero-atmosphere * {
 @keyframes page-enter {
   from {
     opacity: 1;
-    clip-path: circle(24% at var(--pe-ox) var(--pe-oy));
+    clip-path: circle(18% at var(--pe-ox) var(--pe-oy));
   }
   to {
     opacity: 1;
@@ -2386,4 +2389,60 @@ html:lang(ar) {
     top right, top right,
     bottom left, bottom left,
     bottom right, bottom right;
+}
+
+/* =========================================================================
+   GLOBAL-2 (ROUND-2) — line-draw secondary buttons + index-overlay stagger
+   ========================================================================= */
+
+/* Registered angle so the conic border can SPIN via a custom property
+   (Chromium/FF/Safari 16.4+; unsupported engines show the static ring —
+   graceful degradation, opacity transition only). */
+@property --ang {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+.btn-line {
+  position: relative;
+}
+.btn-line::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--ang),
+    transparent 0 34%,
+    var(--signal) 50%,
+    transparent 66% 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-out-expo);
+  pointer-events: none;
+}
+.btn-line:hover::before {
+  opacity: 1;
+  animation: btn-line-spin 1.1s linear infinite;
+}
+@keyframes btn-line-spin {
+  to { --ang: 360deg; }
+}
+
+/* Mobile index overlay — staggered display rows (WS3). */
+.idx-in {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: idx-in 0.55s var(--ease-out-expo) forwards;
+}
+@keyframes idx-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

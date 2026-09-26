@@ -544,6 +544,7 @@ function SuccessBox({
   reference: string
   onSendAnother: () => void
 }) {
+  const tCopy = useTranslations('common')
   const t = useTranslations('pages.contact.form')
   const reduced = useReducedMotion()
   const headingRef = useRef<HTMLHeadingElement>(null)
@@ -598,6 +599,24 @@ function SuccessBox({
               {t('referenceLabel')}{' '}
               {reference ? (
                 <span dir="ltr" className="font-mono tracking-wide">{reference}</span>
+              ) : null}
+              {/* GLOBAL-2 (WS6): one-tap copy of the stored reference
+                  (clipboard + translated toast; denial fails silent). */}
+              {reference ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      void navigator.clipboard?.writeText(reference)
+                      toast.success(tCopy('copied'))
+                    } catch {
+                      /* clipboard denied — the reference stays readable */
+                    }
+                  }}
+                  className="btn-line ms-2 inline-flex min-h-8 items-center rounded-full border border-border px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:border-signal/40 hover:text-signal"
+                >
+                  {tCopy('copy')}
+                </button>
               ) : null}
             </p>
           </div>

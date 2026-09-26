@@ -140,13 +140,17 @@ export default async function ContactPage({
                       <a
                         href={href}
                         {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                        className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:card-lift-hover"
+                        className="corner-ticks group relative flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:card-lift-hover"
                       >
                         <span className={`flex size-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${chipClass}`}>
                           <Icon className="size-5" aria-hidden="true" />
                         </span>
                         <span className="flex-1">
-                          <span className="block text-sm font-medium text-muted-foreground">{t(`channels.${key}.title`)}</span>
+                          <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                            {/* GLOBAL-2 (WS6): channel status LED. */}
+                            <span className="size-1.5 rounded-full bg-g-green" aria-hidden="true" />
+                            {t(`channels.${key}.title`)}
+                          </span>
                           {/* MED-7: UAX#9 bidi isolation for the value —
                               phone groups and the @handle reorder inside
                               an RTL paragraph. The dir="ltr" sits on an

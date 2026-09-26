@@ -307,6 +307,13 @@ export function Hero() {
     let started = false
     const start = () => {
       if (started) return
+      // GLOBAL-2 (WS10): a session the watchdog already degraded never
+      // re-fetches the silk chunk.
+      try {
+        if (sessionStorage.getItem('elyra.heroDegraded') === '1') return
+      } catch {
+        /* storage unavailable — proceed */
+      }
       started = true
       setLoad3D(true)
     }
@@ -326,6 +333,37 @@ export function Hero() {
       window.removeEventListener('keydown', start)
     }
   }, [reduced])
+
+  // GLOBAL-2 (WS10): fps watchdog for the silk canvas — the rune field's
+  // mobile-watchdog pattern extended to the hero: a 3s rolling window under
+  // 30fps degrades to the CSS fallback for the session (sessionStorage flag)
+  // instead of throttling the page forever on weak GPUs.
+  useEffect(() => {
+    if (!load3D || reduced) return
+    let frames = 0
+    let windowStart = performance.now()
+    let raf = 0
+    const tick = (now: number) => {
+      frames += 1
+      const elapsed = now - windowStart
+      if (elapsed >= 3000) {
+        if ((frames * 1000) / elapsed < 30) {
+          try {
+            sessionStorage.setItem('elyra.heroDegraded', '1')
+          } catch {
+            /* storage unavailable — degrade this session only */
+          }
+          setLoad3D(false)
+          return
+        }
+        frames = 0
+        windowStart = now
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [load3D, reduced])
 
   const show3D = !reduced && load3D
 
@@ -525,7 +563,7 @@ export function Hero() {
                  .hero-marquee comment); a more opaque white/10 fill
                  replaces the glass blur. Ring offset: exact elyra-deep
                  surface token (G2-4 F7). */
-              className="group inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 text-base font-medium text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-elyra-deep"
+              className="btn-line group inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 text-base font-medium text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-elyra-deep"
             >
               <Play className="size-4" aria-hidden="true" />
               {t('ctaSecondary')}

@@ -638,7 +638,7 @@ export function AutomationSimulator({
 
         <div className="mt-4 grid gap-4 lg:grid-cols-5">
           {/* Step card */}
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-6 lg:col-span-3">
+          <div className="corner-ticks relative rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-6 lg:col-span-3">
             {/* MED-8: live region for status changes (idle/running/stepOf).
                 The per-frame ms counter below is deliberately OUTSIDE this
                 region — polite announcements happen on status/step change
@@ -714,7 +714,7 @@ export function AutomationSimulator({
               duplicates the polite announcements from the step card.
               dir="ltr" keeps timestamps/monospace alignment correct even
               on the Arabic RTL page. */}
-          <div className="flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/50 lg:col-span-2">
+          <div className="corner-ticks relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/50 lg:col-span-2">
             <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-white/85">{t('logTitle')}</h3>
               <span

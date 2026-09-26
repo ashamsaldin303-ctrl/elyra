@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { getDir } from '@/i18n/routing'
+import { SignalWave } from '@/components/shared/signal-wave'
 
 /* Batch 3 item 16: recovery destinations — home + the 5 main routes,
    labelled with the existing nav.* keys (no new message keys; the
@@ -23,19 +24,39 @@ export default async function NotFound() {
   const Arrow = isRtl ? ArrowLeft : ArrowRight
 
   return (
-    <section className="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-4 text-center">
-      <p className="kicker">404</p>
-      <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-        {t('notFoundTitle')}
-      </h1>
-      <p className="mt-4 max-w-md text-muted-foreground">{t('notFoundDesc')}</p>
-      <Link
-        href="/"
-        className="mt-8 inline-flex h-11 items-center gap-2 rounded-full bg-primary px-6 text-primary-foreground transition-transform hover:scale-105"
-      >
-        {t('backToHome')}
-        <Arrow className="size-4" aria-hidden="true" />
-      </Link>
+    <section className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-4 py-24">
+      {/* GLOBAL-2 (WS8): the 404 is an INSTRUMENT FAULT PANEL — mono error
+          code, display title, a broken reading (SignalWave faded out mid-
+          trace) and the recovery grid beneath the panel. */}
+      <div className="corner-ticks relative w-full rounded-2xl border border-border bg-card p-8 text-center sm:p-12">
+        <p
+          lang="en"
+          dir="ltr"
+          className="font-mono text-[11px] uppercase tracking-[0.22em] text-destructive"
+        >
+          ERR 404 — ROUTE_NOT_FOUND
+        </p>
+        <h1 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl" style={{ fontVariationSettings: '"wght" 800' }}>
+          {t('notFoundTitle')}
+        </h1>
+        <p className="mx-auto mt-4 max-w-md text-muted-foreground">{t('notFoundDesc')}</p>
+        <Link
+          href="/"
+          className="btn-energy mt-8 inline-flex h-11 items-center gap-2 rounded-full bg-primary px-6 text-primary-foreground transition-transform hover:scale-[1.02]"
+        >
+          {t('backToHome')}
+          <Arrow className="size-4" aria-hidden="true" />
+        </Link>
+        <div
+          className="mx-auto mt-10 max-w-md opacity-70"
+          style={{
+            WebkitMask: 'linear-gradient(to right, black 45%, transparent 72%)',
+            mask: 'linear-gradient(to right, black 45%, transparent 72%)',
+          }}
+        >
+          <SignalWave className="block w-full" />
+        </div>
+      </div>
 
       {/* Batch 3 item 16: recovery nav — the 404 previously dead-ended
           with only the home CTA (audit 1-b); these chips catch visitors
