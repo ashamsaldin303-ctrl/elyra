@@ -223,7 +223,11 @@ export function WorkGrid() {
                   {/* GLOBAL-2 (WS4): the comparison becomes a PLATE — mono
                       caption bar (folio · category · scene) + bezel ticks. */}
                   <div className="corner-ticks relative overflow-hidden rounded-2xl border border-border bg-card">
-                    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border px-4 py-2">
+                    {/* GLOBAL-4: the folio bar is chrome (the category also
+                        lives in the card's own chip below) — aria-hidden
+                        keeps its 10px mono under the decorative-chrome
+                        allowance of the 11px live-text floor. */}
+                    <div aria-hidden="true" className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border px-4 py-2">
                       <span lang="en" dir="ltr" className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                         PLT-0{i + 1} · {p.category}
                       </span>
@@ -317,6 +321,11 @@ export function WorkGrid() {
           >
             {openCase ? (
               <>
+                {/* GLOBAL-4 (WS4-mobile): grab handle for the bottom-sheet
+                    mode — the thumb affordance radix doesn't draw. */}
+                {mobileTier ? (
+                  <span aria-hidden="true" className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-white/25" />
+                ) : null}
                 <SheetHeader className="flex flex-row items-start justify-between gap-4 px-6 pt-6">
                   <SheetTitle className="text-2xl font-extrabold tracking-tight">
                     {t(`projects.${openCase.key}.title`)}

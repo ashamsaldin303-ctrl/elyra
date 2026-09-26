@@ -70,3 +70,17 @@
 | M10 | rail الإشارة على 390: 6 عقد بتباعد 68px وحزمة 10px — مقروءة ولا تلمس المحتوى | navbar SignalRail | لا تغيير (موثق) |
 
 ** gates بعد GLOBAL-3:** parity ‏761 GREEN · slop ‏0 · secrets ‏0 · صياغة TS أخضر (7 ملفات). commit: `GLOBAL-3`.
+
+## 5) ملحق الموبايل الثاني (ROUND-3/M) — GLOBAL-4
+
+> منهج: audit كود شامل لأنماط الجوال بعد GLOBAL-3 (knob/terminal/rings/sheet/overflow/tap) + محاولتان موثقتان للتحقق البصري الحي (تعذرتا: خادم الجولة الثانية 687MB واقفاً من 1GB، وتجميد static يفشل لأن Turbopack يبني closure الـ chunks عبر manifest داخل JS لا روابط نصية). القرارات أدناه code-evidence فقط.
+
+| # | Finding | الإصلاح |
+|---|---|---|
+| M11 | وميض النقر الرمادي WebKit يلوث الأسطح الداكنة على الجوال | `-webkit-tap-highlight-color: transparent` على body |
+| M12 | لمسة الـ btn-energy hover-only = بلا تغذية على اللمس | `.btn-energy:active::after` نفس الـ sweep |
+| M13 | شريط folio اللوحات 10px مرئي = تحت أرضية 11px للنص الحي | الفئة فولكلور_decorative (التصنيف مكرر في chip أسفل البطاقة) → aria-hidden |
+| M14 | bottom-sheet بلا مقبض سحب (Radix لا يرسمه) | grab handle ‏40×4px أعلى الـ Case Sheet في طور الجوال فقط |
+| — | موثّق سليم بلا تغيير: knob سحب 36px + السحب على كامل البطاقة (pointer capture) · terminal ‏max-h-48 overflow-auto · حلقات الحاسبة grid عمودي على الجوال · overflow-x clip · city panel ‏max-w-[85%] · safe-area في overlay والفوتر | — |
+
+commit: `GLOBAL-4`. gates: parity ‏761 · slop ‏0 · secrets ‏0 · TS syntax ok.

@@ -271,6 +271,9 @@
     font-family: var(--font-app), system-ui, -apple-system, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* GLOBAL-4 (mobile): kill the grey WebKit tap flash — the instrument
+       surfaces carry their own active/hover feedback. */
+    -webkit-tap-highlight-color: transparent;
     /* IA — second clip rung: some engines only honor the root-level clip
        on the VIEWPORT when both html and body carry it (the overflow
        propagation rule); belt + suspenders, same no-scroll-container
@@ -2345,7 +2348,10 @@ html:lang(ar) {
   opacity: 0;
   pointer-events: none;
 }
-.btn-energy:hover::after {
+.btn-energy:hover::after,
+.btn-energy:active::after {
+  /* GLOBAL-4: touch devices never hover — the sweep also fires on press,
+     giving taps the same energy feedback as pointers. */
   animation: btn-energy-sweep 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes btn-energy-sweep {
